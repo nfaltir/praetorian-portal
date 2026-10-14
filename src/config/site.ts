@@ -14,7 +14,7 @@ export const site = {
   reunionYear: 2030,
   /*
     Exact reunion start, as an ISO string with UTC offset,
-    e.g. "2030-08-14T18:00:00-07:00".
+    e.g. "2030-08-14T18:00:00+10:00" (Chuuk time).
     Leave null until the date is confirmed: the banner then shows
     "Reunion 2030" with no countdown.
     (Moves to an organizer-editable setting once the database is in.)

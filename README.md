@@ -39,7 +39,7 @@ npm run lint
 | Signed-in user lookup (auth seam) | `src/lib/session.ts` |
 | Mock data (delete in step 2) | `src/lib/mock-data.ts` |
 
-Setting `reunionDate` in `src/config/site.ts` (ISO with offset, e.g. `"2030-08-14T18:00:00-07:00"`) turns on the banner countdown. While it is `null` the banner shows "Date to be announced".
+Setting `reunionDate` in `src/config/site.ts` (ISO with offset, e.g. `"2030-08-14T18:00:00+10:00"`) turns on the banner countdown. While it is `null` the banner shows "Date to be announced".
 
 ## Rules the code follows
 
