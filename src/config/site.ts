@@ -22,7 +22,7 @@ export const site = {
   reunionDate: null as string | null,
 
   /* Time zone used to display every date and time in the portal */
-  timeZone: "America/Los_Angeles",
+  timeZone: "Pacific/Chuuk", /* UTC+10, no daylight saving */
 
   tagline: "Reconnecting. Rebuilding. Celebrating.",
   sidebarQuote: ["Same halls.", "New chapters."],
