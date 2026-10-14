@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Praetorianz Reunion Portal
 
-## Getting Started
+Private portal for the Xavier High School Class of 2010 (Praetorianz), reunion 2030.
 
-First, run the development server:
+Next.js 16 (App Router, Cache Components), TypeScript, Tailwind CSS 4, Recharts, Lucide.
+
+## Status
+
+Step 1 of the build: app shell, theme and dashboard on **mock data**.
+No database, no authentication yet. Do not deploy publicly in this state.
+
+| Step | Scope | Status |
+|---|---|---|
+| 1 | Shell, theme tokens, dashboard on mock data | Done |
+| 2 | Drizzle + Neon schema, Better Auth, roles, 2FA, setup links | Next |
+| 3 | Ledger: record, reverse, audit log, targets | |
+| 4 | Dashboard on real data | |
+| 5 | Updates, events | |
+| 6 | Messages inbox | |
+| 7 | Encrypted JSON export and daily backup | |
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # production build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things live
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Change this | File |
+|---|---|
+| Colors, radii (whole site) | `src/app/globals.css`, the `:root` block |
+| School name, class, year, reunion date, tagline | `src/config/site.ts` |
+| Sidebar items and who sees them | `src/config/nav.ts` |
+| Contribution math | `src/lib/ledger.ts` |
+| Signed-in user lookup (auth seam) | `src/lib/session.ts` |
+| Mock data (delete in step 2) | `src/lib/mock-data.ts` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Setting `reunionDate` in `src/config/site.ts` (ISO with offset, e.g. `"2030-08-14T18:00:00-07:00"`) turns on the banner countdown. While it is `null` the banner shows "Date to be announced".
 
-## Learn More
+## Rules the code follows
 
-To learn more about Next.js, take a look at the following resources:
+- Contributions are integer cents. Entries are never edited or deleted; corrections are reversal entries.
+- Class goal is the sum of individual targets (default $400). Targets are private; public views show dollars contributed only.
+- Anything that reads the session sits inside a `<Suspense>` boundary (Cache Components requirement). Never await the session at the top of a layout.
+- Hiding a nav link is cosmetic. Every page and server action checks the role on the server.
+- No em dashes in UI text.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Fonts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Inter and Cormorant Garamond are self-hosted from `src/app/fonts` (SIL Open Font License, see the license files there), so members' browsers never contact Google.

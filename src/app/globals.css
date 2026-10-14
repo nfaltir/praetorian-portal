@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
+/*
+  THEME
+  This block is the only place the portal's colors live.
+  Change a value here and every page, chart and component follows.
+  Derived tints below are mixed from these, so they follow too.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --brand-ink: #092c2a; /* sidebar and dark surfaces */
+  --brand: #174f46; /* primary actions, progress, charts */
+  --brand-soft: #b8d4d0; /* secondary chart elements */
+  --accent: #b89a5b; /* small heritage highlights only */
+
+  /* Surfaces and text */
+  --page: #f6f4ee; /* page background */
+  --panel: #ffffff; /* content panels */
+  --text: #263238; /* primary text */
+  --text-muted: #66747d; /* secondary text */
+  --line: #e7ebe8; /* dividers, tracks, neutral chart parts */
+
+  /* Status (always paired with an icon and a label) */
+  --success: #237a57;
+  --warning: #a96716;
+  --danger: #b54747;
+
+  /* Shape */
+  --radius-panel: 14px;
+  --radius-control: 10px;
+
+  /* Derived, no need to edit */
+  --brand-tint: color-mix(in oklab, var(--brand) 9%, white);
+  --accent-tint: color-mix(in oklab, var(--accent) 14%, white);
+  --success-tint: color-mix(in oklab, var(--success) 11%, white);
+  --warning-tint: color-mix(in oklab, var(--warning) 12%, white);
+  --danger-tint: color-mix(in oklab, var(--danger) 11%, white);
+  --on-dark: #f3f1ea;
+  --on-dark-muted: color-mix(in oklab, var(--on-dark) 66%, var(--brand-ink));
+  --on-dark-line: color-mix(in oklab, var(--on-dark) 12%, var(--brand-ink));
+  --on-dark-hover: color-mix(in oklab, var(--on-dark) 7%, var(--brand-ink));
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-tint: var(--brand-tint);
+  --color-accent: var(--accent);
+  --color-accent-tint: var(--accent-tint);
+  --color-page: var(--page);
+  --color-panel: var(--panel);
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-line: var(--line);
+  --color-success: var(--success);
+  --color-success-tint: var(--success-tint);
+  --color-warning: var(--warning);
+  --color-warning-tint: var(--warning-tint);
+  --color-danger: var(--danger);
+  --color-danger-tint: var(--danger-tint);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+  --color-on-dark-line: var(--on-dark-line);
+  --color-on-dark-hover: var(--on-dark-hover);
+
+  --radius-panel: var(--radius-panel);
+  --radius-control: var(--radius-control);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--page);
+  color: var(--text);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular figures for every money and count value */
+.figures {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+dialog::backdrop {
+  background: color-mix(in oklab, var(--brand-ink) 55%, transparent);
+}
+
+/* Cormorant defaults to old-style numerals; years and money need lining figures */
+.font-serif {
+  font-variant-numeric: lining-nums;
 }
