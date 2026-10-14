@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ChevronDown, LogOut, Settings } from "lucide-react";
-import type { Member } from "@/lib/types";
-import { roleLabels } from "@/lib/types";
+import { ChevronDown, LogOut, ShieldCheck } from "lucide-react";
+import type { CurrentUser } from "@/lib/session";
+import { roleLabels } from "@/lib/roles";
+import { signOutAction } from "@/app/actions/auth";
 import { initials } from "@/lib/format";
 
 /* <details> keeps the menu working without JavaScript. */
-export function AccountMenu({ user }: { user: Member }) {
+export function AccountMenu({ user }: { user: CurrentUser }) {
   return (
     <details className="group relative">
       <summary className="flex cursor-pointer list-none items-center gap-2.5 rounded-full py-1 pr-2 pl-1 hover:bg-panel [&::-webkit-details-marker]:hidden">
@@ -24,13 +25,14 @@ export function AccountMenu({ user }: { user: Member }) {
           <p className="text-[14px] font-medium">{user.name}</p>
           <p className="text-[12px] text-muted">@{user.username}</p>
         </div>
-        <Link href="/settings" className="flex items-center gap-2.5 px-4 py-2.5 text-[14px] hover:bg-brand-tint">
-          <Settings size={16} aria-hidden="true" /> Settings
+        <Link href="/settings/security" className="flex items-center gap-2.5 px-4 py-2.5 text-[14px] hover:bg-brand-tint">
+          <ShieldCheck size={16} aria-hidden="true" /> Password and 2FA
         </Link>
-        {/* Becomes a server action that ends the session in step 2 */}
-        <button type="button" disabled className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[14px] text-muted">
-          <LogOut size={16} aria-hidden="true" /> Sign out
-        </button>
+        <form action={signOutAction} className="border-t border-line">
+          <button type="submit" className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[14px] hover:bg-brand-tint">
+            <LogOut size={16} aria-hidden="true" /> Sign out
+          </button>
+        </form>
       </div>
     </details>
   );

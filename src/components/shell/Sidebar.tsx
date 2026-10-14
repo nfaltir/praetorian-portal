@@ -16,7 +16,8 @@ export function Sidebar() {
           <SidebarNav />
         </Suspense>
       </nav>
-      <div className="px-6 pb-6">
+      {/* Decoration gives way to navigation on short screens */}
+      <div className="px-6 pb-6 [@media(max-height:860px)]:hidden">
         <p className="mb-4 font-serif text-[18px] italic leading-snug text-on-dark-muted">
           {site.sidebarQuote.map((line) => (
             <span key={line} className="block">{line}</span>

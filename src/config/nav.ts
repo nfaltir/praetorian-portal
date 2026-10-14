@@ -1,4 +1,4 @@
-import type { Role } from "@/lib/types";
+import type { Role } from "@/lib/roles";
 
 export type NavItem = {
   href: string;

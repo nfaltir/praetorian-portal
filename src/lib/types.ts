@@ -1,12 +1,6 @@
-export type Role = "member" | "chair" | "vice_chair" | "treasurer" | "superuser";
-
-export const roleLabels: Record<Role, string> = {
-  member: "Classmate",
-  chair: "Chair",
-  vice_chair: "Vice Chair",
-  treasurer: "Treasurer",
-  superuser: "Developer",
-};
+import type { Role } from "./roles";
+export type { Role } from "./roles";
+export { roleLabels } from "./roles";
 
 export type Member = {
   id: string;

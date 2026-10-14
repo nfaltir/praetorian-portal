@@ -1,7 +1,8 @@
 /*
   MOCK DATA FOR UI WORK ONLY.
-  Every name, amount and event here is invented. This module is replaced
-  by database queries in step 2 and must never ship to production.
+  Every name, amount and event here is invented. Accounts and sign-in are
+  real since step 2; the dashboard content below is replaced by database
+  queries in steps 3 to 5 and must never ship to production.
 */
 import type { Activity, LedgerEntry, Member, Poll, ReunionEvent, Update } from "./types";
 import { site } from "@/config/site";
@@ -28,9 +29,6 @@ export const members: Member[] = [
   { id: "m19", name: "Leo Santos", username: "lsantos", role: "member", activated: false },
   { id: "m20", name: "Hannah Ioanis", username: "hioanis", role: "member", activated: false },
 ];
-
-/* The signed-in user for the mock session */
-export const currentMemberId = "m01";
 
 /*
   Private targets in cents. Default $400.
@@ -186,5 +184,3 @@ export function mockTimeline() {
   return { ledger, updates, events, activePoll, activity };
 }
 
-/* Unread staff replies for the signed-in member */
-export const unreadMessages = 1;

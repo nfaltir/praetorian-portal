@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import { ComingSoon } from "@/components/ui/ComingSoon";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Settings" };
-
-export default function Page() {
-  return <ComingSoon title="Settings" planned="step 2" />;
+/* Only security settings exist for now. Profile settings arrive with the directory (Phase 2). */
+export default function SettingsPage() {
+  redirect("/settings/security");
 }

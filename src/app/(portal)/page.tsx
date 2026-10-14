@@ -1,4 +1,4 @@
-import { connection } from "next/server";
+import { requireUser } from "@/lib/session";
 import { site } from "@/config/site";
 import { members, mockTimeline, targets } from "@/lib/mock-data";
 import { classSummary, reversedIds, totalsByMember } from "@/lib/ledger";
@@ -9,7 +9,7 @@ import { ContributionProgress } from "@/components/dashboard/ContributionProgres
 import { PollPreview, RecentActivity, UpcomingEvents } from "@/components/dashboard/SideModules";
 
 export default async function HomePage() {
-  await connection(); // render per request: data and relative times are live
+  await requireUser(); // per-request: also makes relative times live
   const now = new Date();
   const { ledger, updates, events, activePoll, activity } = mockTimeline();
 

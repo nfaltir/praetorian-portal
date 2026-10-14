@@ -1,8 +1,10 @@
 import { Construction } from "lucide-react";
+import { requireUser } from "@/lib/session";
 import { Panel } from "./Panel";
 
 /* Temporary page body for sections not built yet. Delete with the last one. */
-export function ComingSoon({ title, planned }: { title: string; planned: string }) {
+export async function ComingSoon({ title, planned }: { title: string; planned: string }) {
+  await requireUser(); // every portal page checks the session itself
   return (
     <div className="mx-auto max-w-[1400px]">
       <h1 className="font-serif text-[34px] leading-tight font-semibold">{title}</h1>
