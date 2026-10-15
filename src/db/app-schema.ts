@@ -1,4 +1,16 @@
-import { index, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+  type AnyPgColumn,
+  check,
+  date,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 
 /*
@@ -40,4 +52,47 @@ export const auditLog = pgTable(
     detail: jsonb("detail").$type<Record<string, unknown>>(),
   },
   (t) => [index("audit_log_at_idx").on(t.at), index("audit_log_target_idx").on(t.targetUserId)],
+);
+
+/*
+  The contribution ledger. One row per bank payment a treasurer records.
+
+  Rules enforced by the database itself, not just the app:
+  - Amounts are positive integer cents, at most $100,000 per entry.
+  - Rows are never edited or deleted (trigger in the next migration).
+    A mistake is fixed with a "reversal" row pointing at the original,
+    then a new correct "payment" row.
+  - A reversal must point at an entry; a payment must not.
+  - Each entry can be reversed at most once (unique reverses_id).
+  - Members and recorders can't be deleted while they have entries
+    (ON DELETE RESTRICT), so money history can't vanish with an account.
+*/
+export const contribution = pgTable(
+  "contribution",
+  {
+    id: text("id").primaryKey(),
+    memberId: text("member_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    kind: text("kind", { enum: ["payment", "reversal"] }).notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    paidOn: date("paid_on").notNull(), // date on the bank record
+    recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+    recordedBy: text("recorded_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    reversesId: text("reverses_id").references((): AnyPgColumn => contribution.id, { onDelete: "restrict" }),
+    memo: text("memo"),
+  },
+  (t) => [
+    check("contribution_amount_range", sql`${t.amountCents} > 0 AND ${t.amountCents} <= 10000000`),
+    check(
+      "contribution_reversal_link",
+      sql`(${t.kind} = 'reversal') = (${t.reversesId} IS NOT NULL)`,
+    ),
+    check("contribution_memo_length", sql`${t.memo} IS NULL OR char_length(${t.memo}) <= 200`),
+    uniqueIndex("contribution_reverses_once_idx").on(t.reversesId),
+    index("contribution_member_idx").on(t.memberId),
+    index("contribution_recorded_at_idx").on(t.recordedAt),
+  ],
 );
