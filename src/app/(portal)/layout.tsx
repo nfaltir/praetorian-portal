@@ -2,10 +2,15 @@ import { Sidebar } from "@/components/shell/Sidebar";
 import { TopBar } from "@/components/shell/TopBar";
 
 /*
-  The frame renders instantly. User-specific parts (nav for your role,
-  unread count, account menu) stream in behind their own Suspense
-  boundaries, and the page streams in behind loading.tsx.
+  Portal pages render on the server in tens of milliseconds, so a click
+  waits for the finished page instead of flashing a loading skeleton.
+  (React keeps any skeleton on screen for at least 300ms, which made
+  every navigation slower than the page itself.)
+  User-specific shell parts still stream in behind their own Suspense
+  boundaries on the first load.
 */
+export const instant = false;
+
 export default function PortalLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-dvh">

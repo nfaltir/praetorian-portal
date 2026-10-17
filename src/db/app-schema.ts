@@ -96,3 +96,39 @@ export const contribution = pgTable(
     index("contribution_recorded_at_idx").on(t.recordedAt),
   ],
 );
+
+
+/*
+  Class updates (news posts from organizers). Table is "announcement"
+  because UPDATE is a reserved word in SQL; the UI calls them Updates.
+  - Plain text only: rendered as text, never as HTML, so a post can't
+    inject markup or scripts.
+  - Staff can post, edit and delete; every change goes to audit_log.
+  - Authors can't be deleted while they have posts (accounts are
+    disabled, not deleted), so attribution never breaks.
+*/
+export const UPDATE_CATEGORIES = ["Announcement", "Logistics", "Events", "Fundraising", "Volunteers"] as const;
+
+export const announcement = pgTable(
+  "announcement",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    category: text("category", { enum: UPDATE_CATEGORIES }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    publishedAt: timestamp("published_at", { withTimezone: true }).notNull().defaultNow(),
+    editedAt: timestamp("edited_at", { withTimezone: true }),
+  },
+  (t) => [
+    check("announcement_title_length", sql`char_length(${t.title}) BETWEEN 1 AND 120`),
+    check("announcement_body_length", sql`char_length(${t.body}) BETWEEN 1 AND 5000`),
+    check(
+      "announcement_category_valid",
+      sql`${t.category} IS NULL OR ${t.category} IN ('Announcement', 'Logistics', 'Events', 'Fundraising', 'Volunteers')`,
+    ),
+    index("announcement_published_idx").on(t.publishedAt),
+  ],
+);

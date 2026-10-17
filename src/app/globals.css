@@ -8,16 +8,16 @@
 */
 :root {
   /* Brand */
-  --brand-ink: #092c2a; /* sidebar and dark surfaces */
-  --brand: #174f46; /* primary actions, progress, charts */
-  --brand-soft: #b8d4d0; /* secondary chart elements */
-  --accent: #b89a5b; /* small heritage highlights only */
+  --brand-ink: #101f35; /* sidebar and dark surfaces */
+  --brand: #243f63; /* primary actions, progress, charts */
+  --brand-soft: #b9c9da; /* secondary chart elements */
+  --accent: #b89a5b; /* small heritage highlights only, on dark surfaces */
 
   /* Surfaces and text */
   --page: #f6f4ee; /* page background */
   --panel: #ffffff; /* content panels */
   --text: #263238; /* primary text */
-  --text-muted: #66747d; /* secondary text */
+  --text-muted: #5d6a73; /* secondary text, 5:1 on page and panel */
   --line: #e7ebe8; /* dividers, tracks, neutral chart parts */
 
   /* Status (always paired with an icon and a label) */
@@ -26,8 +26,8 @@
   --danger: #b54747;
 
   /* Shape */
-  --radius-panel: 14px;
-  --radius-control: 10px;
+  --panel-radius: 14px;
+  --control-radius: 10px;
 
   /* Derived, no need to edit */
   --brand-tint: color-mix(in oklab, var(--brand) 9%, white);
@@ -64,8 +64,8 @@
   --color-on-dark-line: var(--on-dark-line);
   --color-on-dark-hover: var(--on-dark-hover);
 
-  --radius-panel: var(--radius-panel);
-  --radius-control: var(--radius-control);
+  --radius-panel: var(--panel-radius);
+  --radius-control: var(--control-radius);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
@@ -83,14 +83,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Tabular figures for every money and count value */
-.figures {
-  font-variant-numeric: tabular-nums lining-nums;
+/* Navy ring on light surfaces (gold is under 3:1 there) */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+/* Gold ring on dark surfaces (sidebar, banner, mobile nav) */
+.bg-brand-ink :focus-visible {
+  outline-color: var(--accent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -99,6 +100,8 @@ body {
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -109,4 +112,13 @@ dialog::backdrop {
 /* Cormorant defaults to old-style numerals; years and money need lining figures */
 .font-serif {
   font-variant-numeric: lining-nums;
+}
+
+/*
+  Tabular figures for every money and count value.
+  Must stay AFTER .font-serif: both set font-variant-numeric, and the later
+  rule wins on elements that have both classes (countdown, totals).
+*/
+.figures {
+  font-variant-numeric: tabular-nums lining-nums;
 }

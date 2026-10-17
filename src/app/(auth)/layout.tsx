@@ -4,13 +4,12 @@ import { SchoolSketch } from "@/components/shell/SchoolSketch";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative isolate flex min-h-dvh items-center justify-center overflow-hidden bg-brand-ink px-4 py-10">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(110%_90%_at_80%_0%,var(--brand)_0%,var(--brand-ink)_62%)]" aria-hidden="true" />
+    <div className="relative isolate flex min-h-dvh items-center justify-center overflow-hidden bg-linear-to-b from-sky-900 to-a bg-slate-800 px-4 py-10">
       <div className="absolute inset-x-0 bottom-0 -z-10 mx-auto max-w-3xl opacity-60" aria-hidden="true">
         <SchoolSketch />
       </div>
 
-      <div className="w-full max-w-[420px]">
+      <div className="w-full max-w-105">
         <div className="mb-7 flex flex-col items-center text-center">
           <Emblem size={48} />
           <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.18em] text-on-dark-muted">{site.schoolName}</p>

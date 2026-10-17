@@ -13,15 +13,18 @@ export type NavItem = {
 
 export const STAFF_ROLES: Role[] = ["chair", "vice_chair", "treasurer", "superuser"];
 
+/*
+  Hidden for launch (pages not built yet). Uncomment a line when its page ships:
+  { href: "/classmates", label: "Classmates", icon: "classmates" },
+  { href: "/events", label: "Events", icon: "events" },
+  { href: "/polls", label: "Voting & Polls", icon: "polls" },
+  { href: "/gallery", label: "Gallery", icon: "gallery" },
+*/
 export const navItems: NavItem[] = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/updates", label: "Updates", icon: "updates" },
   { href: "/contributions", label: "My Contributions", icon: "contributions" },
-  { href: "/classmates", label: "Classmates", icon: "classmates" },
-  { href: "/events", label: "Events", icon: "events" },
-  { href: "/polls", label: "Voting & Polls", icon: "polls" },
   { href: "/treasury", label: "Treasury", icon: "treasury" },
-  { href: "/gallery", label: "Gallery", icon: "gallery" },
   { href: "/messages", label: "Messages", icon: "messages" },
   { href: "/settings", label: "Settings", icon: "settings" },
   { href: "/admin", label: "Staff Admin", icon: "admin", roles: STAFF_ROLES },
