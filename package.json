@@ -10,7 +10,8 @@
     "auth:schema": "node --env-file=.env.local scripts/auth-schema.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/migrate.ts",
-    "create-superuser": "node --env-file-if-exists=.env.local --import tsx scripts/create-superuser.ts"
+    "create-superuser": "node --env-file-if-exists=.env.local --import tsx scripts/create-superuser.ts",
+        "probe": "node --env-file-if-exists=.env.local --import tsx scripts/latency-probe.ts"
   },
   "dependencies": {
     "better-auth": "1.7.8",

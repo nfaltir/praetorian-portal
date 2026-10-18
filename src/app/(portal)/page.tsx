@@ -9,15 +9,14 @@ import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { LatestUpdates } from "@/components/dashboard/LatestUpdates";
 import { ContributionProgress } from "@/components/dashboard/ContributionProgress";
-import { UpcomingEvents } from "@/components/dashboard/SideModules";
 
 export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
 
 /*
   Dashboard on real data.
   - Classmates and contributions come from the database.
-  - Updates, events, polls and activity are built in later steps; until
-    then their panels show empty states instead of sample content.
+  - Events, polls and activity are not built yet, so their side column is
+    left out until they ship (SideModules.tsx keeps the components).
   - Targets are used only to compute the class goal. No individual target
     is passed to any component.
 */
@@ -43,30 +42,21 @@ export default async function HomePage() {
     <div className="mx-auto flex max-w-350 flex-col gap-6">
       <WelcomeBanner />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(320px,360px)]">
-        <div className="flex min-w-0 flex-col gap-6">
-          <StatCards
-            joined={members.filter((m) => m.activated).length}
-            added={members.length}
-            summary={summary}
-            nextEvent={null}
-          />
-
-          <LatestUpdates updates={updates} members={members} now={now} />
-          
-
-          <ContributionProgress
-            summary={summary}
-            members={members}
-            totals={totals}
-            recent={ledger.slice(0, 6)}
-            reversed={reversedIds(ledger)}
-          />
-        </div>
-
-        <div className="flex min-w-0 flex-col gap-6">
-          <UpcomingEvents events={[]} />
-        </div>
+      <div className="flex min-w-0 flex-col gap-6">
+        <StatCards
+          joined={members.filter((m) => m.activated).length}
+          added={members.length}
+          summary={summary}
+          nextEvent={null}
+        />
+        <LatestUpdates updates={updates} members={members} now={now} />
+        <ContributionProgress
+          summary={summary}
+          members={members}
+          totals={totals}
+          recent={ledger.slice(0, 6)}
+          reversed={reversedIds(ledger)}
+        />
       </div>
 
       <figure className="relative overflow-hidden rounded-panel border border-line bg-panel px-6 py-7 sm:px-10">
