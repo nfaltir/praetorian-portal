@@ -5,6 +5,7 @@ import { Alert } from "@/components/ui/Form";
 import { ChangePasswordCard, TwoFactorCard } from "./SecurityCards";
 
 export const metadata: Metadata = { title: "Password and 2FA" };
+export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
 
 export default async function SecurityPage({ searchParams }: PageProps<"/settings/security">) {
   const user = await requireUser({ allowMissingTwoFactor: true });

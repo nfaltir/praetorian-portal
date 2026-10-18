@@ -12,8 +12,20 @@ type Step = "password" | "totp" | "backup";
 const BAD_LOGIN = "That username and password don't match. Check both and try again.";
 const TOO_MANY = "Too many attempts. Wait a few minutes before trying again.";
 
-function messageFor(status: number | undefined, fallback: string) {
-  return status === 429 ? TOO_MANY : fallback;
+/*
+  Only real credential failures (400/401) get the credential message.
+  Anything else is a problem with the site, not the person, so say so and
+  show the status code: otherwise a server or configuration error looks
+  exactly like a wrong password and can't be diagnosed.
+*/
+function messageFor(err: { status?: number; message?: string }, credentialMessage: string) {
+  const s = err.status;
+  console.error("[sign-in]", s, err.message); // visible in the browser console for debugging
+  if (s === 429) return TOO_MANY;
+  if (s === 400 || s === 401) return credentialMessage;
+  if (s === 403) return `Sign-in was blocked by the server (error 403). Make sure you're on the portal's main address, then try again. If it keeps happening, tell an organizer.`;
+  if (s && s >= 500) return `The portal had a problem on its side (error ${s}). Please try again in a minute.`;
+  return `Couldn't reach the portal${s ? ` (error ${s})` : ""}. Check your connection and try again.`;
 }
 
 export function LoginForm({ notice }: { notice: string | null }) {
@@ -37,7 +49,7 @@ export function LoginForm({ notice }: { notice: string | null }) {
       password: String(form.get("password") ?? ""),
     });
     setBusy(false);
-    if (err) return setError(messageFor(err.status, BAD_LOGIN));
+    if (err) return setError(messageFor(err, BAD_LOGIN));
     if (data && "twoFactorRedirect" in data && data.twoFactorRedirect) return setStep("totp");
     enter();
   }
@@ -54,7 +66,7 @@ export function LoginForm({ notice }: { notice: string | null }) {
     setBusy(false);
     if (err) {
       return setError(
-        messageFor(err.status, step === "totp" ? "That code didn't work. Codes change every 30 seconds." : "That backup code didn't work, or it was already used."),
+        messageFor(err, step === "totp" ? "That code didn't work. Codes change every 30 seconds." : "That backup code didn't work, or it was already used."),
       );
     }
     enter();

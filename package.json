@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/migrate.ts",
     "create-superuser": "node --env-file-if-exists=.env.local --import tsx scripts/create-superuser.ts",
-        "probe": "node --env-file-if-exists=.env.local --import tsx scripts/latency-probe.ts"
+    "probe": "node --env-file-if-exists=.env.local --import tsx scripts/latency-probe.ts",
+    "db:studio": "node --env-file-if-exists=.env.local node_modules/drizzle-kit/bin.cjs studio"
   },
   "dependencies": {
     "better-auth": "1.7.8",
