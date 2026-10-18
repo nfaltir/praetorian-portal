@@ -19,7 +19,7 @@ export const publicNav = navItems.filter((i) => !i.roles);
 async function userNav() {
   const user = await getCurrentUserOrNull();
   if (!user) return { user, items: publicNav, unread: 0 };
-  const unread = await getUnreadCount(user.id);
+  const unread = await getUnreadCount(user);
   return { user, items: navFor(user.role), unread };
 }
 

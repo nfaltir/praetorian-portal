@@ -122,3 +122,39 @@ dialog::backdrop {
 .figures {
   font-variant-numeric: tabular-nums lining-nums;
 }
+/*
+  Dark scope for the sign-in card (login, 2FA, set password).
+  The forms only use theme tokens, so redefining them here restyles
+  every auth form at once without touching component code.
+*/
+.theme-dark {
+  color-scheme: dark;
+  --text: #eef1f5;
+  --text-muted: #a3afbd; /* 7:1 on the card */
+  --line: rgb(255 255 255 / 0.14);
+  --page: rgb(255 255 255 / 0.05); /* input background */
+  --panel: rgb(255 255 255 / 0.09); /* focused input */
+  --brand: #d9bf86; /* button + links: light gold */
+  --brand-ink: #e8d3a3; /* button hover */
+  --on-dark: #101f35; /* button text: 9:1 on the gold */
+  --success: #6fd3a5;
+  --danger: #f29b9b;
+  --success-tint: color-mix(in oklab, var(--success) 14%, transparent);
+  --danger-tint: color-mix(in oklab, var(--danger) 14%, transparent);
+  --accent-tint: color-mix(in oklab, var(--accent) 18%, transparent);
+  color: var(--text);
+}
+
+.theme-dark :focus-visible {
+  outline-color: var(--brand);
+}
+
+/* Browser autofill paints inputs white; keep them dark */
+.theme-dark input:-webkit-autofill,
+.theme-dark input:-webkit-autofill:hover,
+.theme-dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--text);
+  box-shadow: 0 0 0 1000px #1c2b3f inset;
+  transition: background-color 9999s;
+}

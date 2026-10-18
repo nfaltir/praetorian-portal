@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
+  boolean,
   check,
   date,
   index,
@@ -130,5 +131,57 @@ export const announcement = pgTable(
       sql`${t.category} IS NULL OR ${t.category} IN ('Announcement', 'Logistics', 'Events', 'Fundraising', 'Volunteers')`,
     ),
     index("announcement_published_idx").on(t.publishedAt),
+  ],
+);
+
+
+/*
+  Messages: classmates contact the organizers.
+  - One thread per conversation, started by a classmate (memberId).
+  - The classmate sees only their own threads. All staff share one inbox
+    and see every thread (it may cover payments, so treasurers need it).
+  - Read state is two timestamps: the classmate's, and the shared staff
+    inbox's. Unread = a newer message from the other side.
+  - Plain text, no edits or deletes in the app: what was said stays said.
+*/
+export const messageThread = pgTable(
+  "message_thread",
+  {
+    id: text("id").primaryKey(),
+    memberId: text("member_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    subject: text("subject").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    lastMessageAt: timestamp("last_message_at", { withTimezone: true }).notNull().defaultNow(),
+    lastAuthorIsStaff: boolean("last_author_is_staff").notNull().default(false),
+    memberReadAt: timestamp("member_read_at", { withTimezone: true }),
+    staffReadAt: timestamp("staff_read_at", { withTimezone: true }),
+    closedAt: timestamp("closed_at", { withTimezone: true }),
+  },
+  (t) => [
+    check("message_thread_subject_length", sql`char_length(${t.subject}) BETWEEN 1 AND 120`),
+    index("message_thread_member_idx").on(t.memberId),
+    index("message_thread_last_idx").on(t.lastMessageAt),
+  ],
+);
+
+export const message = pgTable(
+  "message",
+  {
+    id: text("id").primaryKey(),
+    threadId: text("thread_id")
+      .notNull()
+      .references(() => messageThread.id, { onDelete: "restrict" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    fromStaff: boolean("from_staff").notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check("message_body_length", sql`char_length(${t.body}) BETWEEN 1 AND 4000`),
+    index("message_thread_idx").on(t.threadId, t.createdAt),
   ],
 );

@@ -105,3 +105,8 @@ Setting `reunionDate` in `src/config/site.ts` (ISO with offset, e.g. `"2030-08-1
 ## Fonts
 
 Inter and Cormorant Garamond are self-hosted from `src/app/fonts` (SIL Open Font License, see the license files there), so members' browsers never contact Google.
+
+
+G-chok
+Melivin Jackson
+Marshallese Messiah

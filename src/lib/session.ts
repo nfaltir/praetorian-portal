@@ -3,6 +3,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "./auth";
+import { countUnread } from "@/server/messages";
 import { can, isRole, type Role } from "./roles";
 
 /*
@@ -60,7 +61,11 @@ export async function requirePermission(check: (role: Role) => boolean): Promise
 }
 
 
-export async function getUnreadCount(userId: string): Promise<number> {
-  void userId;
-  return 0; // Messages arrive in step 6
+/* Conversations with something new for this person (sidebar badge). Never throws: a badge isn't worth breaking the page. */
+export async function getUnreadCount(user: CurrentUser): Promise<number> {
+  try {
+    return await countUnread(user);
+  } catch {
+    return 0;
+  }
 }

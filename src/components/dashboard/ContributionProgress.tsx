@@ -1,3 +1,5 @@
+import { Star } from "lucide-react";
+import { site } from "@/config/site";
 import type { ClassSummary } from "@/lib/ledger";
 import type { LedgerEntry, Member } from "@/lib/types";
 import { money, percent, shortDate } from "@/lib/format";
@@ -26,7 +28,9 @@ export function ContributionProgress({
   const ranked = members
     .map((m) => ({ member: m, cents: Math.max(0, totals.get(m.id) ?? 0) }))
     .sort((a, b) => b.cents - a.cents || a.member.name.localeCompare(b.member.name));
-  const maxCents = Math.max(1, ...ranked.map((r) => r.cents));
+  // Bars measure progress toward the standard (public) target, not each
+  // other, so one large gift doesn't shrink everyone else's bar.
+  const barScale = Math.max(1, site.defaultTargetCents);
 
   const legend = [
     { label: "Collected", value: summary.collectedCents, pct: summary.percent, swatch: "bg-brand" },
@@ -72,11 +76,6 @@ export function ContributionProgress({
             <dd className="figures w-24 text-right font-semibold">{money(summary.goalCents)}</dd>
             <dd className="w-12" />
           </div>
-          {summary.overTargetCents > 0 && (
-            <p className="mt-1 text-[12px] text-muted">
-              Includes <span className="figures font-medium text-ink">{money(summary.overTargetCents)}</span> given above individual targets.
-            </p>
-          )}
         </dl>
       </div>
 
@@ -89,23 +88,41 @@ export function ContributionProgress({
           </p>
         </div>
         <ol className="mt-3 grid gap-x-8 gap-y-2.5 md:grid-cols-2">
-          {ranked.map(({ member, cents }) => (
-            <li key={member.id} className="grid grid-cols-[minmax(0,9rem)_1fr_4.5rem] items-center gap-3 text-[13px]">
-              <span className="truncate">{member.name}</span>
-              <span className="h-2 overflow-hidden rounded-full bg-line" aria-hidden="true">
-                {cents > 0 && (
-                  <span
-                    className="block h-full rounded-full bg-brand"
-                    style={{ width: `${Math.max(3, (cents / maxCents) * 100)}%` }}
-                  />
-                )}
-              </span>
-              <span className={`figures text-right ${cents > 0 ? "font-medium" : "text-muted"}`}>
-                {cents > 0 ? money(cents) : "None yet"}
-              </span>
-            </li>
-          ))}
+          {ranked.map(({ member, cents }) => {
+            // Measured against the public standard amount, never a private target
+            const beyond = cents > barScale;
+            return (
+              <li key={member.id} className="grid grid-cols-[minmax(0,9rem)_1fr_4.5rem] items-center gap-3 text-[13px]">
+                <span className="flex min-w-0 items-center gap-1">
+                  <span className="truncate">{member.name}</span>
+                  {beyond && (
+                    <>
+                      <Star size={12} className="shrink-0 fill-accent text-accent" aria-hidden="true" />
+                      <span className="sr-only">(gave above {money(barScale)})</span>
+                    </>
+                  )}
+                </span>
+                <span className="h-2 overflow-hidden rounded-full bg-line" aria-hidden="true">
+                  {cents > 0 && (
+                    <span
+                      className={`block h-full rounded-full ${beyond ? "bg-accent" : "bg-brand"}`}
+                      style={{ width: `${Math.min(100, Math.max(3, (cents / barScale) * 100))}%` }}
+                    />
+                  )}
+                </span>
+                <span className={`figures text-right ${cents > 0 ? "font-medium" : "text-muted"}`}>
+                  {cents > 0 ? money(cents) : "None yet"}
+                </span>
+              </li>
+            );
+          })}
         </ol>
+        {ranked.some((r) => r.cents > barScale) && (
+          <p className="mt-3 flex items-center gap-1.5 text-[12px] text-muted">
+            <Star size={12} className="fill-accent text-accent" aria-hidden="true" />
+            Gave above the standard {money(barScale)}. Thank you!
+          </p>
+        )}
       </div>
 
       {/* Recent ledger entries */}
