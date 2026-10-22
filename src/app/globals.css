@@ -173,3 +173,22 @@ dialog::backdrop {
     cursor: pointer;
   }
 }
+/*
+  Light glass scope for the sign-in card (login, 2FA, set password).
+  Same idea as .theme-dark: the forms only use theme tokens, so redefining
+  them here restyles every auth form at once.
+*/
+.theme-glass {
+  --text: #15202e;
+  --text-muted: #4a5663; /* 6:1 on the card */
+  --line: rgb(15 30 50 / 0.14);
+  --page: rgb(255 255 255 / 0.75); /* input background */
+  --panel: #ffffff; /* focused input */
+  --brand: #1e3a5f; /* button + links: deep navy */
+  --brand-ink: #13283f; /* button hover */
+  --on-dark: #ffffff; /* button text */
+  --danger: #a4161a;
+  --danger-tint: rgb(164 22 26 / 0.08);
+  --success-tint: color-mix(in oklab, var(--success) 12%, transparent);
+  color: var(--text);
+}
