@@ -30,8 +30,14 @@ export const can = {
   manageLedger: (r: Role) => r === "treasurer" || r === "superuser",
   /* Change anyone's role, export data */
   manageRoles: (r: Role) => r === "superuser",
-  /* Staff accounts must have 2FA before they can do anything */
-  requiresTwoFactor: (r: Role) => STAFF.includes(r),
+  /*
+    Only the superuser must have 2FA (it can change roles and reach
+    everything). Other staff and classmates may turn it on in Settings,
+    but aren't forced to, to keep sign-in simple for the class.
+    Ledger changes stay safe without it: entries are append-only and
+    every change is in the audit log with who made it.
+  */
+  requiresTwoFactor: (r: Role) => r === "superuser",
 } as const;
 
 export function isStaff(r: Role) {

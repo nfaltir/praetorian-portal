@@ -24,15 +24,15 @@ export const site = {
   /* Time zone used to display every date and time in the portal */
   timeZone: "Pacific/Chuuk", /* UTC+10, no daylight saving */
 
-  tagline: "Reconnecting. Rebuilding. Celebrating.",
-  sidebarQuote: ["Same halls.", "New chapters."],
+  tagline: "Competent. Conscientious. Compassionate.",
+  sidebarQuote: ["Once a Praetorian.", "Always a Praetorian."],
   footerQuote: [
     "Not just a reunion, but a reconnection",
     "with the people who made our journey special.",
   ],
 
   /* Optional banner photo in /public, e.g. "/images/banner.jpg". null uses the drawn fallback. */
-  bannerImage: null as string | null,
+  bannerImage: "/images/banner.jpg" as string | null,
 
   currency: "USD",
   /* Default contribution target per member, in cents */
