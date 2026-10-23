@@ -15,7 +15,6 @@ export const STAFF_ROLES: Role[] = ["chair", "vice_chair", "treasurer", "superus
 
 /*
   Hidden for launch (pages not built yet). Uncomment a line when its page ships:
-  { href: "/classmates", label: "Classmates", icon: "classmates" },
   { href: "/events", label: "Events", icon: "events" },
   { href: "/gallery", label: "Gallery", icon: "gallery" },
 */
@@ -23,6 +22,7 @@ export const navItems: NavItem[] = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/updates", label: "Updates", icon: "updates" },
   { href: "/polls", label: "Polls", icon: "polls" },
+  { href: "/classmates", label: "Classmates", icon: "classmates" },
   { href: "/contributions", label: "My Contributions", icon: "contributions" },
   { href: "/treasury", label: "Treasury", icon: "treasury" },
   { href: "/messages", label: "Messages", icon: "messages" },
