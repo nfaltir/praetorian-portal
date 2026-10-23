@@ -261,3 +261,35 @@ export const pollVote = pgTable(
     index("poll_vote_option_idx").on(t.optionId),
   ],
 );
+
+/*
+  RSVP: one row per classmate for the reunion. No row means "not replied".
+  - Organizers record RSVPs (like contributions); classmates can't edit them.
+  - Everyone can see every status, guest count and specialty item.
+  - Guests and the specialty item only apply to "attending"; the database
+    clears them otherwise, so a stale value can't linger after a change.
+*/
+export const RSVP_STATUSES = ["attending", "maybe", "not_attending"] as const;
+
+export const rsvp = pgTable(
+  "rsvp",
+  {
+    userId: text("user_id")
+      .primaryKey()
+      .references(() => user.id, { onDelete: "cascade" }),
+    status: text("status", { enum: RSVP_STATUSES }).notNull(),
+    guests: integer("guests").notNull().default(0),
+    bringing: text("bringing"), // the fun field: "famous apple pie"
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedBy: text("updated_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+  },
+  (t) => [
+    check("rsvp_status_valid", sql`${t.status} IN ('attending', 'maybe', 'not_attending')`),
+    check("rsvp_guests_range", sql`${t.guests} BETWEEN 0 AND 5`),
+    check("rsvp_bringing_length", sql`${t.bringing} IS NULL OR char_length(${t.bringing}) BETWEEN 1 AND 80`),
+    check("rsvp_extras_only_when_attending", sql`${t.status} = 'attending' OR (${t.guests} = 0 AND ${t.bringing} IS NULL)`),
+    index("rsvp_status_idx").on(t.status),
+  ],
+);

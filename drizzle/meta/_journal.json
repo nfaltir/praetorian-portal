@@ -50,6 +50,13 @@
       "when": 1792694450939,
       "tag": "0006_polls",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792796361422,
+      "tag": "0007_rsvp",
+      "breakpoints": true
     }
   ]
 }
