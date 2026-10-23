@@ -22,7 +22,7 @@ export const navItems: NavItem[] = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/updates", label: "Updates", icon: "updates" },
   { href: "/polls", label: "Polls", icon: "polls" },
-  { href: "/classmates", label: "Classmates", icon: "classmates" },
+  { href: "/classmates", label: "RSVP", icon: "classmates" },
   { href: "/contributions", label: "My Contributions", icon: "contributions" },
   { href: "/treasury", label: "Treasury", icon: "treasury" },
   { href: "/messages", label: "Messages", icon: "messages" },
