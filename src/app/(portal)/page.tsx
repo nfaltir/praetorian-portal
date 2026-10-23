@@ -5,9 +5,11 @@ import type { Member } from "@/lib/types";
 import { listMembers } from "@/server/members";
 import { loadLedger, loadRoster } from "@/server/ledger";
 import { loadUpdates } from "@/server/updates";
+import { listPolls } from "@/server/polls";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { LatestUpdates } from "@/components/dashboard/LatestUpdates";
+import { OpenPolls } from "@/components/dashboard/OpenPolls";
 import { ContributionProgress } from "@/components/dashboard/ContributionProgress";
 
 export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
@@ -21,14 +23,15 @@ export const instant = false; // reads the session; blocks on the server by desi
     is passed to any component.
 */
 export default async function HomePage() {
-  await requireUser();
+  const viewer = await requireUser();
   const now = new Date();
 
-  const [allMembers, ledger, roster, updates] = await Promise.all([
+  const [allMembers, ledger, roster, updates, openPolls] = await Promise.all([
     listMembers(),
     loadLedger(),
     loadRoster(),
     loadUpdates(3),
+    listPolls(viewer, { openOnly: true, limit: 3 }),
   ]);
 
   const members: Member[] = allMembers
@@ -50,6 +53,7 @@ export default async function HomePage() {
           nextEvent={null}
         />
         <LatestUpdates updates={updates} members={members} now={now} />
+        <OpenPolls polls={openPolls} now={now} />
         <ContributionProgress
           summary={summary}
           members={members}

@@ -16,7 +16,7 @@ export function Field({
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         {...input}
-        className="h-11 rounded-control border border-muted/30 bg-page px-3.5 text-[15px] text-ink outline-none transition-colors placeholder:text-muted/70 hover:border-muted/50 focus:border-brand focus:bg-panel aria-invalid:border-danger"
+        className="h-11 rounded-control border border-muted/30 bg-page px-3.5 text-base text-ink sm:text-[15px] outline-none transition-colors placeholder:text-muted/70 hover:border-muted/50 focus:border-brand focus:bg-panel aria-invalid:border-danger"
       />
       {hint && !error && <p id={`${id}-hint`} className="text-[12px] text-muted">{hint}</p>}
       {error && <p id={`${id}-error`} className="text-[12px] text-danger">{error}</p>}

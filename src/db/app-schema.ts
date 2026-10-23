@@ -4,12 +4,15 @@ import {
   boolean,
   check,
   date,
+  foreignKey,
   index,
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
+  unique,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
@@ -183,5 +186,78 @@ export const message = pgTable(
   (t) => [
     check("message_body_length", sql`char_length(${t.body}) BETWEEN 1 AND 4000`),
     index("message_thread_idx").on(t.threadId, t.createdAt),
+  ],
+);
+/*
+  Polls: organizers ask a question with 2 to 10 options; each classmate
+  picks one option and may change it until the poll closes.
+  - Votes are anonymous in the app: pages show counts only, never who
+    voted for what (the vote row exists so each person votes once).
+  - A poll closes at closesAt, or earlier if an organizer closes it.
+  - The database enforces one vote per person per poll, and that the
+    chosen option belongs to that poll.
+*/
+export const POLL_RESULTS = ["after_vote", "after_close"] as const;
+
+export const poll = pgTable(
+  "poll",
+  {
+    id: text("id").primaryKey(),
+    question: text("question").notNull(),
+    details: text("details"),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    closesAt: timestamp("closes_at", { withTimezone: true }).notNull(),
+    closedAt: timestamp("closed_at", { withTimezone: true }),
+    showResults: text("show_results", { enum: POLL_RESULTS }).notNull().default("after_vote"),
+  },
+  (t) => [
+    check("poll_question_length", sql`char_length(${t.question}) BETWEEN 1 AND 200`),
+    check("poll_details_length", sql`${t.details} IS NULL OR char_length(${t.details}) <= 1000`),
+    check("poll_show_results_valid", sql`${t.showResults} IN ('after_vote', 'after_close')`),
+    index("poll_closes_idx").on(t.closesAt),
+  ],
+);
+
+export const pollOption = pgTable(
+  "poll_option",
+  {
+    id: text("id").primaryKey(),
+    pollId: text("poll_id")
+      .notNull()
+      .references(() => poll.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    position: integer("position").notNull(),
+  },
+  (t) => [
+    check("poll_option_label_length", sql`char_length(${t.label}) BETWEEN 1 AND 120`),
+    // Lets a vote reference (option, poll) together, so it can't point at another poll's option
+    unique("poll_option_id_poll_key").on(t.id, t.pollId),
+    index("poll_option_poll_idx").on(t.pollId, t.position),
+  ],
+);
+
+export const pollVote = pgTable(
+  "poll_vote",
+  {
+    pollId: text("poll_id")
+      .notNull()
+      .references(() => poll.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    optionId: text("option_id").notNull(),
+    votedAt: timestamp("voted_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.pollId, t.userId] }), // one vote per person per poll
+    foreignKey({
+      name: "poll_vote_option_in_poll_fk",
+      columns: [t.optionId, t.pollId],
+      foreignColumns: [pollOption.id, pollOption.pollId],
+    }).onDelete("cascade"),
+    index("poll_vote_option_idx").on(t.optionId),
   ],
 );
