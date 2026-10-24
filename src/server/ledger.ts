@@ -145,7 +145,7 @@ export async function reverseEntry(actor: CurrentUser, input: { entryId: string;
 }
 
 export async function setTarget(actor: CurrentUser, input: { memberId: string; targetCents: number }) {
-  assertLedgerAccess(actor);
+  if (!can.manageTargets(actor.role)) throw new LedgerError("Only organizers can change targets.");
   const targetCents = check(
     z.number().int("Use whole cents").min(0, "Target can't be negative").max(MAX_TARGET_CENTS, "That target is too large"),
     input.targetCents,

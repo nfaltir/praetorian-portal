@@ -9,14 +9,18 @@ import { Badge, Panel, ProgressBar } from "@/components/ui/Panel";
 import { RecordPaymentForm, ReverseEntryForm, TargetForm } from "./TreasuryForms";
 
 export const metadata: Metadata = { title: "Treasury" };
+export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
 
 /*
-  Everyone sees class totals and who has given what (agreed: public).
-  Treasurers additionally see targets, notes, and the record/reverse tools.
+  Everyone sees class totals, every payment, and each classmate's target
+  and progress (agreed by the class: all public).
+  Treasurers additionally see notes and the record/reverse tools.
+  Any organizer can adjust a target (every change is audit-logged).
 */
 export default async function TreasuryPage() {
   const viewer = await requireUser();
   const isTreasurer = can.manageLedger(viewer.role);
+  const canEditTargets = can.manageTargets(viewer.role);
 
   const [ledger, roster] = await Promise.all([loadLedger(), loadRoster()]);
   const totals = totalsByMember(ledger);
@@ -28,7 +32,7 @@ export default async function TreasuryPage() {
   const nameOf = (id: string) => names.get(id) ?? "Former member";
 
   return (
-    <div className="mx-auto flex max-w-1100px flex-col gap-6">
+    <div className="mx-auto flex max-w-[1100px] flex-col gap-6">
       <div>
         <h1 className="font-serif text-[34px] leading-tight font-semibold">Treasury</h1>
         <p className="mt-1 text-[14px] text-muted">
@@ -105,32 +109,41 @@ export default async function TreasuryPage() {
         )}
       </Panel>
 
-      {isTreasurer && (
-        <Panel className="overflow-hidden" labelledBy="targets-heading">
-          <div className="px-6 pt-5 pb-3">
-            <h2 id="targets-heading" className="font-serif text-[22px] font-semibold">Targets</h2>
-            <p className="mt-1 text-[13px] text-muted">
-              Private: only treasurers see these. The class goal is the sum of all targets. Every change is logged.
-            </p>
-          </div>
-          <ul className="divide-y divide-line border-t border-line">
-            {roster.map((m) => {
-              const given = Math.max(0, totals.get(m.id) ?? 0);
-              return (
-                <li key={m.id} className="flex flex-col gap-2 px-6 py-3 sm:flex-row sm:items-center">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-medium">{m.name}</p>
-                    <p className="figures text-[12px] text-muted">
-                      Given {money(given)} of {money(m.targetCents)}
-                    </p>
+      <Panel className="overflow-hidden" labelledBy="targets-heading">
+        <div className="px-6 pt-5 pb-3">
+          <h2 id="targets-heading" className="font-serif text-[22px] font-semibold">Classmates and targets</h2>
+          <p className="mt-1 text-[13px] text-muted">
+            Each classmate&apos;s target and what they&apos;ve given so far. The class goal is the sum of all targets.
+            {canEditTargets && " Organizers can adjust a target; every change is logged."}
+          </p>
+        </div>
+        <ul className="divide-y divide-line border-t border-line">
+          {roster.map((m) => {
+            const given = Math.max(0, totals.get(m.id) ?? 0);
+            const pct = m.targetCents > 0 ? Math.min(100, (given / m.targetCents) * 100) : 0;
+            const reached = m.targetCents > 0 && given >= m.targetCents;
+            return (
+              <li key={m.id} className="flex flex-col gap-2 px-6 py-3.5 sm:flex-row sm:items-center sm:gap-6">
+                <div className="min-w-0 flex-1">
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px]">
+                    <span className="font-medium capitalize">{m.name}</span>
+                    {reached && <Badge tone="success" icon={CircleCheck}>Target reached</Badge>}
+                  </p>
+                  <p className="figures mt-0.5 text-[12px] text-muted">
+                    Given {money(given)} of {money(m.targetCents)} · {percent(pct)}
+                  </p>
+                  <div className="mt-1.5 max-w-[420px]">
+                    <ProgressBar value={pct} label={`${m.name}: ${percent(pct)} of target`} />
                   </div>
+                </div>
+                {canEditTargets && (
                   <TargetForm memberId={m.id} memberName={m.name} targetDollars={(m.targetCents / 100).toString()} />
-                </li>
-              );
-            })}
-          </ul>
-        </Panel>
-      )}
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </Panel>
     </div>
   );
 }

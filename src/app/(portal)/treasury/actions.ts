@@ -76,7 +76,7 @@ export async function reverseEntryAction(_prev: LedgerActionResult, form: FormDa
 }
 
 export async function setTargetAction(_prev: LedgerActionResult, form: FormData): Promise<LedgerActionResult> {
-  const actor = await requirePermission(can.manageLedger);
+  const actor = await requirePermission(can.manageTargets);
   const memberId = field(form, "memberId", 64);
   const target = field(form, "target", 20);
 

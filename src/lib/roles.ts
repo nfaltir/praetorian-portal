@@ -28,6 +28,9 @@ export const can = {
   manageContent: (r: Role) => STAFF.includes(r),
   /* Record and reverse contributions, change targets */
   manageLedger: (r: Role) => r === "treasurer" || r === "superuser",
+  /* Change classmates' targets. Targets are public (agreed by the class);
+     any organizer may adjust one, and every change is audit-logged. */
+  manageTargets: (r: Role) => STAFF.includes(r),
   /* Change anyone's role, export data */
   manageRoles: (r: Role) => r === "superuser",
   /*
