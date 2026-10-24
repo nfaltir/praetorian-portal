@@ -12,6 +12,8 @@ export const site = {
   monogram: "XHS",
 
   reunionYear: 2030,
+  /* Shown publicly on the landing page. Update when the venue is confirmed. */
+  reunionPlace: "Chuuk",
   /*
     Exact reunion start, as an ISO string with UTC offset,
     e.g. "2030-08-14T18:00:00+10:00" (Chuuk time).
@@ -33,6 +35,9 @@ export const site = {
 
   /* Optional banner photo in /public, e.g. "/images/banner.jpg". null uses the drawn fallback. */
   bannerImage: "/images/banner.jpg" as string | null,
+
+  /* Credit line in the footer */
+  builtBy: "the Praetorianz Tech Team",
 
   currency: "USD",
   /* Default contribution target per member, in cents */

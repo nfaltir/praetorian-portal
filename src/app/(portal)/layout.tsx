@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/shell/Sidebar";
 import { TopBar } from "@/components/shell/TopBar";
+import { Footer } from "@/components/shell/Footer";
 
 /*
   Portal pages render on the server in tens of milliseconds, so a click
@@ -26,6 +27,7 @@ export default function PortalLayout({ children }: LayoutProps<"/">) {
         <main id="main" className="flex-1 px-4 pt-2 pb-10 sm:px-6 lg:px-8 lg:pt-0">
           {children}
         </main>
+        <Footer />
       </div>
     </div>
   );

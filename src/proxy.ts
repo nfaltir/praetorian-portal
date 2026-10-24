@@ -7,7 +7,7 @@ import { getSessionCookie } from "better-auth/cookies";
   src/lib/session.ts on every page and action.
 */
 
-const PUBLIC_PATHS = ["/login", "/setup"];
+const PUBLIC_PATHS = ["/login", "/setup", "/welcome"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -15,7 +15,8 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
   if (!getSessionCookie(request, { cookiePrefix: "portal" })) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    // The home address shows the public landing page; deeper links go to sign-in
+    return NextResponse.redirect(new URL(pathname === "/" ? "/welcome" : "/login", request.url));
   }
   return NextResponse.next();
 }
