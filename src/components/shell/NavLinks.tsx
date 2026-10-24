@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CalendarDays, CircleDollarSign, House, Images, Landmark, Mail,
-  Newspaper, Settings, ShieldCheck, Users, Vote,
+  Music, Newspaper, Settings, ShieldCheck, Users, Vote,
 } from "lucide-react";
 import type { NavItem } from "@/config/nav";
 
@@ -15,6 +15,7 @@ const icons = {
   classmates: Users,
   events: CalendarDays,
   polls: Vote,
+  playlists: Music,
   treasury: Landmark,
   gallery: Images,
   messages: Mail,

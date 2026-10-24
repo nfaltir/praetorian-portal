@@ -5,7 +5,7 @@ export type NavItem = {
   label: string;
   icon:
     | "home" | "updates" | "contributions" | "classmates" | "events"
-    | "polls" | "treasury" | "gallery" | "messages" | "settings" | "admin";
+    | "polls" | "playlists" | "treasury" | "gallery" | "messages" | "settings" | "admin";
   /* Omit for everyone. Hiding a link is cosmetic: every page and action
      also checks the role on the server. */
   roles?: Role[];
@@ -23,6 +23,7 @@ export const navItems: NavItem[] = [
   { href: "/updates", label: "Updates", icon: "updates" },
   { href: "/polls", label: "Polls", icon: "polls" },
   { href: "/classmates", label: "RSVP", icon: "classmates" },
+  { href: "/playlists", label: "Music Playlists", icon: "playlists" },
   { href: "/contributions", label: "My Contributions", icon: "contributions" },
   { href: "/treasury", label: "Treasury", icon: "treasury" },
   { href: "/messages", label: "Messages", icon: "messages" },
