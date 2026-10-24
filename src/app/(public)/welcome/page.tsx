@@ -120,14 +120,14 @@ export default function WelcomePage() {
     <div className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-linear-to-b from-white via-[#fbf8f1] to-[#f1e9d8]">
       {/* One continuous gradient with soft glows down the whole page: no section has its own background */}
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-        <div className="absolute -top-40 -left-32 size-[560px] rounded-full bg-[#1e3a5f]/10 blur-3xl" />
-        <div className="absolute top-[18%] -right-48 size-[560px] rounded-full bg-[#9b2226]/8 blur-3xl" />
-        <div className="absolute top-[42%] -left-48 size-[520px] rounded-full bg-sky-200/25 blur-3xl" />
-        <div className="absolute top-[62%] -right-40 size-[520px] rounded-full bg-amber-200/30 blur-3xl" />
-        <div className="absolute bottom-0 left-[25%] size-[480px] rounded-full bg-rose-200/25 blur-3xl" />
+        <div className="absolute -top-40 -left-32 size-140nded-full bg-[#1e3a5f]/10 blur-3xl" />
+        <div className="absolute top-[18%] -right-48 size-140 rounded-full bg-[#9b2226]/8 blur-3xl" />
+        <div className="absolute top-[42%] -left-48 size-130 rounded-full bg-sky-200/25 blur-3xl" />
+        <div className="absolute top-[62%] -right-40 size-130 rounded-full bg-amber-200/30 blur-3xl" />
+        <div className="absolute bottom-0 left-[25%] size-120 rounded-full bg-rose-200/25 blur-3xl" />
       </div>
 
-      <header className="mx-auto flex w-full max-w-[1100px] items-center justify-between gap-4 px-4 py-5 sm:px-6">
+      <header className="mx-auto flex w-full max-w-275 items-center justify-between gap-4 px-4 py-5 sm:px-6">
         <div className="flex items-center gap-2.5">
           <Emblem size={34} />
           <span className="font-serif text-[20px] font-semibold text-ink">{site.className}</span>
@@ -142,7 +142,7 @@ export default function WelcomePage() {
 
       <main id="main" className="flex-1">
         {/* Hero */}
-        <section className="mx-auto flex max-w-[860px] flex-col items-center px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-16">
+        <section className="mx-auto flex max-w-215 flex-col items-center px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-16">
           <Emblem size={84} />
           <p className="mt-5 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted">
             {site.schoolName} · {classLabel}
@@ -152,7 +152,7 @@ export default function WelcomePage() {
             <br />
             <span className="italic text-[#9b2226]">together again.</span>
           </h1>
-          <p className="mt-5 max-w-[560px] text-[16px] leading-relaxed text-muted sm:text-[17px]">
+          <p className="mt-5 max-w-140 text-[16px] leading-relaxed text-muted sm:text-[17px]">
             The private home of the {site.className} reunion: plans, decisions, RSVPs and contributions, all in one place
             for the class.
           </p>
@@ -175,7 +175,7 @@ export default function WelcomePage() {
 
         {/* Motto and mission: just type on the page, no band or card */}
         <section aria-labelledby="motto-heading">
-          <div className="mx-auto max-w-[760px] px-4 py-16 text-center sm:px-6 sm:py-24">
+          <div className="mx-auto max-w-190 px-4 py-16 text-center sm:px-6 sm:py-24">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">Our school motto</p>
             <h2 id="motto-heading" className="mt-3 font-serif text-[36px] leading-tight font-semibold text-[#9b2226] italic sm:text-[46px]">
               Ut Omnes Unum Sint
@@ -190,7 +190,7 @@ export default function WelcomePage() {
         </section>
 
         {/* Features: an editorial list, not a wall of cards */}
-        <section aria-labelledby="inside-heading" className="mx-auto max-w-[1000px] px-4 py-16 sm:px-6 sm:py-24">
+        <section aria-labelledby="inside-heading" className="mx-auto max-w-250 px-4 py-16 sm:px-6 sm:py-24">
           <h2 id="inside-heading" className="text-center font-serif text-[30px] font-semibold text-ink sm:text-[36px]">
             What&apos;s inside
           </h2>
@@ -208,18 +208,18 @@ export default function WelcomePage() {
         </section>
 
         {/* Open books preview */}
-        <section aria-labelledby="books-heading" className="mx-auto max-w-[1100px] px-4 py-16 sm:px-6 sm:py-24">
+        <section aria-labelledby="books-heading" className="mx-auto max-w-275 px-4 py-16 sm:px-6 sm:py-24">
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_1.1fr]">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">Open books</p>
               <h2 id="books-heading" className="mt-3 font-serif text-[32px] leading-tight font-semibold text-ink sm:text-[40px]">
                 Every dollar, in plain sight.
               </h2>
-              <p className="mt-4 max-w-[440px] text-[15px] leading-relaxed text-muted">
+              <p className="mt-4 max-w-110 text-[15px] leading-relaxed text-muted">
                 Treasurers record each contribution as it reaches the class account. Everyone can see the class goal, each
                 classmate&apos;s target and how far along we are. Mistakes are corrected openly, never erased.
               </p>
-              <p className="mt-3 max-w-[440px] text-[15px] leading-relaxed text-muted">
+              <p className="mt-3 max-w-110 text-[15px] leading-relaxed text-muted">
                 Go above your target and you get a gold star. Bragging rights included.
               </p>
             </div>
@@ -228,13 +228,13 @@ export default function WelcomePage() {
         </section>
 
         {/* The plan: the fun part. Same background as everything else. */}
-        <section aria-labelledby="plan-heading" className="mx-auto max-w-[760px] px-4 py-16 text-center sm:px-6 sm:py-24">
+        <section aria-labelledby="plan-heading" className="mx-auto max-w-190 px-4 py-16 text-center sm:px-6 sm:py-24">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">Classified</p>
           <h2 id="plan-heading" className="mt-3 font-serif text-[36px] leading-tight font-semibold text-ink sm:text-[46px]">
             The master plan
           </h2>
           <p className="mt-2 text-[14px] text-muted">Approved by the committee. Mostly.</p>
-          <ol className="mx-auto mt-10 flex max-w-[520px] flex-col gap-5 text-left">
+          <ol className="mx-auto mt-10 flex max-w-130 flex-col gap-5 text-left">
             {PLAN.map((step, i) => {
               const last = i === PLAN.length - 1;
               return (
@@ -251,7 +251,7 @@ export default function WelcomePage() {
         </section>
 
         {/* How to join */}
-        <section id="join" aria-labelledby="join-heading" className="mx-auto max-w-[860px] scroll-mt-6 px-4 pt-8 pb-24 sm:px-6">
+        <section id="join" aria-labelledby="join-heading" className="mx-auto max-w-215 scroll-mt-6 px-4 pt-8 pb-24 sm:px-6">
           <div className="rounded-[22px] border border-white/80 bg-white/70 p-6 shadow-[0_20px_50px_-24px_rgb(60_45_20/0.35)] ring-1 ring-black/5 backdrop-blur-md sm:p-10">
             <div className="flex items-center gap-2.5">
               <KeyRound size={20} className="text-brand" aria-hidden="true" />
