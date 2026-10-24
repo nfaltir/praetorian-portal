@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { can } from "@/lib/roles";
 import { requirePermission } from "@/lib/session";
 import { createUpdate, deleteUpdate, editUpdate, UpdateError } from "@/server/updates";
@@ -52,10 +53,13 @@ async function run(fn: () => Promise<string>, values?: PostValues): Promise<Upda
 export async function createUpdateAction(_prev: UpdateActionResult, form: FormData): Promise<UpdateActionResult> {
   const actor = await requirePermission(can.manageContent);
   const values = readPost(form);
-  return run(async () => {
+  const result = await run(async () => {
     await createUpdate(actor, values);
     return "Update posted.";
   }, values);
+  // Outside run(): redirect works by throwing, and run() must not catch it
+  if (result?.ok) redirect("/updates");
+  return result;
 }
 
 export async function editUpdateAction(_prev: UpdateActionResult, form: FormData): Promise<UpdateActionResult> {
