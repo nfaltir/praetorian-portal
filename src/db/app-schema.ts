@@ -293,3 +293,37 @@ export const rsvp = pgTable(
     index("rsvp_status_idx").on(t.status),
   ],
 );
+
+/*
+  Music playlists: staff-posted cards linking out to a streaming service.
+  - url is NOT what the organizer pasted: src/lib/playlist-url.ts checks it
+    against an allowlist and rebuilds a clean link from the playlist ID.
+  - The checks below are a second line of defense: https on a known host.
+*/
+export const PLAYLIST_PROVIDERS = ["spotify", "youtube", "youtube_music", "soundcloud"] as const;
+
+export const playlist = pgTable(
+  "playlist",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    description: text("description"),
+    provider: text("provider", { enum: PLAYLIST_PROVIDERS }).notNull(),
+    url: text("url").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+  },
+  (t) => [
+    check("playlist_title_length", sql`char_length(${t.title}) BETWEEN 1 AND 80`),
+    check("playlist_description_length", sql`${t.description} IS NULL OR char_length(${t.description}) <= 300`),
+    check("playlist_provider_valid", sql`${t.provider} IN ('spotify', 'youtube', 'youtube_music', 'soundcloud')`),
+    check(
+      "playlist_url_allowed",
+      sql`${t.url} ~ '^https://(open\\.spotify\\.com|www\\.youtube\\.com|music\\.youtube\\.com|soundcloud\\.com)/'`,
+    ),
+    index("playlist_created_idx").on(t.createdAt),
+  ],
+);
