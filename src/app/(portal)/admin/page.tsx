@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { CircleCheck, Clock, ShieldCheck, ShieldOff, UserX } from "lucide-react";
+import Link from "next/link";
+import { CircleCheck, Clock, Download, ShieldCheck, ShieldOff, UserX } from "lucide-react";
 import { can, roleLabels } from "@/lib/roles";
 import { requirePermission } from "@/lib/session";
 import { listMembers, mayManage } from "@/server/members";
@@ -17,11 +18,19 @@ export default async function AdminPage() {
 
   return (
     <div className="mx-auto flex max-w-[1100px] flex-col gap-6">
-      <div>
-        <h1 className="font-serif text-[34px] leading-tight font-semibold">Staff Admin</h1>
-        <p className="figures mt-1 text-[14px] text-muted">
-          {active.length} accounts · {joined} joined · {active.length - joined} waiting on their setup link
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="font-serif text-[34px] leading-tight font-semibold">Staff Admin</h1>
+          <p className="figures mt-1 text-[14px] text-muted">
+            {active.length} accounts · {joined} joined · {active.length - joined} waiting on their setup link
+          </p>
+        </div>
+        <Link
+          href="/admin/exports"
+          className="inline-flex h-11 shrink-0 items-center gap-2 rounded-control border border-line bg-panel px-5 text-[14px] font-medium text-ink transition-colors hover:bg-brand-tint"
+        >
+          <Download size={16} aria-hidden="true" /> Exports
+        </Link>
       </div>
 
       <AddMemberForm canSetRole={can.manageRoles(actor.role)} />
@@ -78,3 +87,5 @@ export default async function AdminPage() {
     </div>
   );
 }
+
+export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
