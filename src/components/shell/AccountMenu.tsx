@@ -10,7 +10,7 @@ export function AccountMenu({ user }: { user: CurrentUser }) {
   return (
     <details className="group relative">
       <summary className="flex cursor-pointer list-none items-center gap-2.5 rounded-full py-1 pr-2 pl-1 hover:bg-panel [&::-webkit-details-marker]:hidden">
-        <span className="grid size-9 place-items-center rounded-full bg-linear-to-r from-orange-300 to-rose-300 text-[13px] font-semibold text-brand-ink" aria-hidden="true">          {initials(user.name)}
+        <span className="grid size-9 place-items-center rounded-full bg-linear-to-r from-orange-300 to-rose-300 text-[13px] font-bold text-white" aria-hidden="true">          {initials(user.name)}
         </span>
         <span className="hidden text-left sm:block">
           <span className="block text-[14px] font-medium leading-tight capitalize">{user.name}</span>
