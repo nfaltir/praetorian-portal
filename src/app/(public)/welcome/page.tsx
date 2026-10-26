@@ -60,7 +60,7 @@ function ContributionsPreview() {
   const classPct = Math.round((collected / goal) * 100);
 
   return (
-    <figure className="rounded-[22px] border border-white/80 bg-white/75 p-6 shadow-[0_24px_60px_-28px_rgb(60_45_20/0.45)] ring-1 ring-black/5 backdrop-blur-md sm:p-8">
+    <figure className="rounded-[22px] border border-white/80 bg-white/80 p-6 shadow-[0_24px_60px_-28px_rgb(60_45_20/0.45)] ring-1 ring-black/5 sm:p-8">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[12px] font-medium text-muted">Class goal</p>
@@ -252,7 +252,7 @@ export default function WelcomePage() {
 
         {/* How to join */}
         <section id="join" aria-labelledby="join-heading" className="mx-auto max-w-215 scroll-mt-6 px-4 pt-8 pb-24 sm:px-6">
-          <div className="rounded-[22px] border border-white/80 bg-white/70 p-6 shadow-[0_20px_50px_-24px_rgb(60_45_20/0.35)] ring-1 ring-black/5 backdrop-blur-md sm:p-10">
+          <div className="rounded-[22px] border border-white/80 bg-white/80 p-6 shadow-[0_20px_50px_-24px_rgb(60_45_20/0.35)] ring-1 ring-black/5 sm:p-10">
             <div className="flex items-center gap-2.5">
               <KeyRound size={20} className="text-brand" aria-hidden="true" />
               <h2 id="join-heading" className="font-serif text-[28px] font-semibold text-ink">How to get in</h2>

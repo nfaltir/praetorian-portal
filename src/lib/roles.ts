@@ -12,7 +12,7 @@ export const roleLabels: Record<Role, string> = {
   chair: "Chair",
   vice_chair: "Vice Chair",
   treasurer: "Treasurer",
-  superuser: "Developer",
+  superuser: "Admin",
 };
 
 export function isRole(value: unknown): value is Role {

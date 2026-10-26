@@ -48,11 +48,11 @@ export async function createMemberAction(_prev: ActionResult, form: FormData): P
   let role: Role = "member";
   const requested = form.get("role");
   if (requested && requested !== "member") {
-    if (!can.manageRoles(actor.role)) return { ok: false, message: "Only the developer account can create staff accounts.", values };
+    if (!can.manageRoles(actor.role)) return { ok: false, message: "Only the admin account can create staff accounts.", values };
     const parsed = roleSchema.safeParse(requested);
     if (!parsed.success) return { ok: false, message: "Unknown role.", values };
-    // Developer (superuser) accounts are created only from the command line
-    if (parsed.data === "superuser") return { ok: false, message: "Developer accounts can't be created here.", values };
+    // Admin (superuser) accounts are created only from the command line
+    if (parsed.data === "superuser") return { ok: false, message: "Admin accounts can't be created here.", values };
     role = parsed.data;
   }
 
@@ -77,7 +77,7 @@ export async function issueLinkAction(_prev: ActionResult, form: FormData): Prom
   const target = await getTarget(id.data);
   if (!target) return { ok: false, message: "Unknown member." };
   if (target.disabled) return { ok: false, message: "Enable this account first." };
-  if (!mayManage(actor, target)) return { ok: false, message: "Only the developer account can issue links for staff." };
+  if (!mayManage(actor, target)) return { ok: false, message: "Only the admin account can issue links for staff." };
   if (target.id === actor.id) return { ok: false, message: "Change your own password in Password and 2FA." };
 
   const purpose = target.activatedAt ? "reset" : "setup";
@@ -95,7 +95,7 @@ export async function toggleDisabledAction(_prev: ActionResult, form: FormData):
   const target = await getTarget(id.data);
   if (!target) return { ok: false, message: "Unknown member." };
   if (target.id === actor.id) return { ok: false, message: "You can't disable your own account." };
-  if (!mayManage(actor, target)) return { ok: false, message: "Only the developer account can disable staff." };
+  if (!mayManage(actor, target)) return { ok: false, message: "Only the admin account can disable staff." };
 
   await setDisabled(actor, target.id, !target.disabled);
   revalidatePath("/admin");
@@ -112,9 +112,9 @@ export async function changeRoleAction(_prev: ActionResult, form: FormData): Pro
   const target = await getTarget(id.data);
   if (!target) return { ok: false, message: "Unknown member." };
   if (target.id === actor.id) return { ok: false, message: "You can't change your own role." };
-  // Granting or removing Developer (superuser) is done only from the command line
+  // Granting or removing Admin (superuser) is done only from the command line
   if (role.data === "superuser" || target.role === "superuser") {
-    return { ok: false, message: "Developer access can only be changed from the command line." };
+    return { ok: false, message: "Admin access can only be changed from the command line." };
   }
   if (target.role === role.data) return { ok: true };
 

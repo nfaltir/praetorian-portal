@@ -192,3 +192,13 @@ dialog::backdrop {
   --success-tint: color-mix(in oklab, var(--success) 12%, transparent);
   color: var(--text);
 }
+
+/*
+  Safety net: nothing can make a page scroll sideways on a phone.
+  clip (not hidden) so the sticky top bar keeps working. Pinch-zoom is
+  deliberately NOT disabled; people who need larger text rely on it.
+*/
+html,
+body {
+  overflow-x: clip;
+}
