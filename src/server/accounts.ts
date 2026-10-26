@@ -6,6 +6,7 @@ import { setupToken, user } from "@/db/schema";
 import { auth, PLACEHOLDER_EMAIL_DOMAIN } from "@/lib/auth";
 import type { Role } from "@/lib/roles";
 import { audit } from "./audit";
+import { clearLimit } from "./rate-limit";
 
 /*
   Account lifecycle that Better Auth's public API doesn't cover, because
@@ -152,7 +153,7 @@ export async function redeemLink(token: string, password: string) {
   if (!link) throw new AccountError("This link is invalid or has expired.");
 
   const target = await db.query.user.findFirst({
-    columns: { id: true, disabled: true, activatedAt: true },
+    columns: { id: true, username: true, disabled: true, activatedAt: true },
     where: eq(user.id, link.userId),
   });
   if (!target || target.disabled) throw new AccountError("This account is disabled. Contact an organizer.");
@@ -161,6 +162,8 @@ export async function redeemLink(token: string, password: string) {
   await ctx.internalAdapter.updatePassword(target.id, await ctx.password.hash(pw));
   // A new password ends every existing session for this account
   await ctx.internalAdapter.deleteUserSessions(target.id);
+  // An organizer-issued link also lifts any failed-sign-in block, so they can sign in right away
+  if (target.username) await clearLimit("signInFail", target.username);
 
   if (!target.activatedAt) {
     await db.update(user).set({ activatedAt: sql`now()` }).where(eq(user.id, target.id));

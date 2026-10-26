@@ -22,9 +22,9 @@ export default function PortalLayout({ children }: LayoutProps<"/">) {
         Skip to content
       </a>
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-x-clip">
         <TopBar />
-        <main id="main" className="flex-1 px-4 pt-2 pb-10 sm:px-6 lg:px-8 lg:pt-0">
+        <main id="main" className="flex-1 px-5 pt-2 pb-10 sm:px-6 lg:px-8 lg:pt-0">
           {children}
         </main>
         <Footer />

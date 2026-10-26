@@ -1,5 +1,6 @@
 import { requireUser } from "@/lib/session";
 import { buildExport, EXPORTS, isExportKind } from "@/server/exports";
+import { limitAction } from "@/server/rate-limit";
 
 /*
   GET /admin/exports/<kind>  ->  CSV download.
@@ -19,6 +20,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ kind: s
   const { kind } = await params;
 
   if (!isExportKind(kind) || !EXPORTS[kind].allowed(actor.role)) return notFound();
+
+  const blocked = await limitAction("export", actor.id);
+  if (blocked) {
+    return new Response(blocked, { status: 429, headers: { "Retry-After": "600", "Cache-Control": "no-store" } });
+  }
 
   const { csv, filename } = await buildExport(actor, kind);
 

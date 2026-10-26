@@ -9,6 +9,8 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { env } from "./env";
 import { can, isRole } from "./roles";
+import { audit } from "@/server/audit";
+import { clearLimit, hitLimit, LIMITS, peekLimit } from "@/server/rate-limit";
 
 /*
   Better Auth configuration.
@@ -21,6 +23,15 @@ import { can, isRole } from "./roles";
     no request from a browser can set them.
   - Endpoints we don't use are switched off so they can't be abused.
 */
+
+/* Same header order as advanced.ipAddress below: Vercel's edge sets the first one */
+function ipFrom(headers: Headers | undefined) {
+  const raw = headers?.get("x-vercel-forwarded-for") ?? headers?.get("x-forwarded-for") ?? "";
+  return raw.split(",")[0]?.trim() || "unknown";
+}
+
+/* Matches what the login form sends (trimmed, lowercased) */
+const normalizeUsername = (v: unknown) => String(v ?? "").trim().toLowerCase().slice(0, 30);
 
 export const PLACEHOLDER_EMAIL_DOMAIN = "users.praetorianz.invalid";
 
@@ -88,19 +99,68 @@ export const auth = betterAuth({
           });
           if (!row || row.disabled) return false;
         },
+        // A session is only created after the password (and 2FA, if on) succeeded
+        after: async (session) => {
+          const row = await db.query.user.findFirst({
+            columns: { username: true },
+            where: eq(schema.user.id, session.userId),
+          });
+          if (row?.username) await clearLimit("signInFail", row.username);
+          await audit({
+            actorId: session.userId,
+            action: "auth.signed_in",
+            targetUserId: session.userId,
+            detail: { ip: session.ipAddress ?? "unknown", device: (session.userAgent ?? "").slice(0, 200) },
+          });
+        },
       },
     },
   },
 
   hooks: {
-    // 2FA is mandatory for staff: refuse to switch it off, even via a direct API call
     before: createAuthMiddleware(async (ctx) => {
+      // Per-account limit: refuse before the password is even checked
+      if (ctx.path === "/sign-in/username") {
+        const name = normalizeUsername(ctx.body?.username);
+        if (name && (await peekLimit("signInFail", name)).count >= LIMITS.signInFail.max) {
+          throw new APIError("TOO_MANY_REQUESTS", { message: "Too many failed attempts for this account. Try again later." });
+        }
+        return;
+      }
+      // 2FA is mandatory for staff: refuse to switch it off, even via a direct API call
       if (ctx.path !== "/two-factor/disable") return;
       const session = await getSessionFromCtx(ctx);
       const role = session?.user.role;
       if (isRole(role) && can.requiresTwoFactor(role)) {
         throw new APIError("FORBIDDEN", { message: "Two-step verification is required for organizer accounts." });
       }
+    }),
+
+    /*
+      Failed sign-ins: counted per account and audit-logged.
+      The typed username is recorded ONLY if it belongs to a real account:
+      people often type their password into the username box by mistake,
+      and that must never end up in the log. Unknown names also don't get
+      a counter row, so a bot can't fill the table with junk keys.
+    */
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/sign-in/username") return;
+      if (!(ctx.context.returned instanceof APIError)) return;
+      const name = normalizeUsername(ctx.body?.username);
+      const account = name
+        ? await db.query.user.findFirst({ columns: { id: true }, where: eq(schema.user.username, name) })
+        : undefined;
+      if (account) await hitLimit("signInFail", name);
+      await audit({
+        actorId: null,
+        action: "auth.sign_in_failed",
+        targetUserId: account?.id ?? null,
+        detail: {
+          username: account ? name : null,
+          ip: ipFrom(ctx.headers),
+          device: (ctx.headers?.get("user-agent") ?? "").slice(0, 200),
+        },
+      });
     }),
   },
 

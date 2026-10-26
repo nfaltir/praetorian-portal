@@ -10,7 +10,10 @@ export type AuditAction =
   | "link.setup_issued"
   | "link.reset_issued"
   | "link.redeemed"
-  | "superuser.created";
+  | "superuser.created"
+  | "auth.signed_in"
+  | "auth.sign_in_failed"
+  | "auth.signed_out";
 
 /* Never put passwords, tokens or secrets in `detail`. */
 export async function audit(entry: {

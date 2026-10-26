@@ -1,5 +1,6 @@
 "use server";
 
+import { limitAction } from "@/server/rate-limit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { can } from "@/lib/roles";
@@ -52,6 +53,8 @@ async function run(fn: () => Promise<string>, values?: PostValues): Promise<Upda
 
 export async function createUpdateAction(_prev: UpdateActionResult, form: FormData): Promise<UpdateActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const values = readPost(form);
   const result = await run(async () => {
     await createUpdate(actor, values);
@@ -64,6 +67,8 @@ export async function createUpdateAction(_prev: UpdateActionResult, form: FormDa
 
 export async function editUpdateAction(_prev: UpdateActionResult, form: FormData): Promise<UpdateActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = field(form, "id", 64);
   const values = readPost(form);
   return run(async () => {
@@ -74,6 +79,8 @@ export async function editUpdateAction(_prev: UpdateActionResult, form: FormData
 
 export async function deleteUpdateAction(_prev: UpdateActionResult, form: FormData): Promise<UpdateActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = field(form, "id", 64);
   return run(async () => {
     await deleteUpdate(actor, id);

@@ -1,5 +1,6 @@
 "use server";
 
+import { limitAction } from "@/server/rate-limit";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { env } from "@/lib/env";
@@ -31,6 +32,8 @@ function linkUrl(token: string) {
 
 export async function createMemberAction(_prev: ActionResult, form: FormData): Promise<ActionResult> {
   const actor = await requirePermission(can.manageMembers);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const values = {
     name: String(form.get("name") ?? "").slice(0, 80),
     username: String(form.get("username") ?? "").slice(0, 30),
@@ -64,6 +67,8 @@ export async function createMemberAction(_prev: ActionResult, form: FormData): P
 
 export async function issueLinkAction(_prev: ActionResult, form: FormData): Promise<ActionResult> {
   const actor = await requirePermission(can.manageMembers);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = idSchema.safeParse(form.get("userId"));
   if (!id.success) return { ok: false, message: "Unknown member." };
 
@@ -81,6 +86,8 @@ export async function issueLinkAction(_prev: ActionResult, form: FormData): Prom
 
 export async function toggleDisabledAction(_prev: ActionResult, form: FormData): Promise<ActionResult> {
   const actor = await requirePermission(can.manageMembers);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = idSchema.safeParse(form.get("userId"));
   if (!id.success) return { ok: false, message: "Unknown member." };
   const target = await getTarget(id.data);
@@ -95,6 +102,8 @@ export async function toggleDisabledAction(_prev: ActionResult, form: FormData):
 
 export async function changeRoleAction(_prev: ActionResult, form: FormData): Promise<ActionResult> {
   const actor = await requirePermission(can.manageRoles);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = idSchema.safeParse(form.get("userId"));
   const role = roleSchema.safeParse(form.get("role"));
   if (!id.success || !role.success) return { ok: false, message: "Invalid request." };

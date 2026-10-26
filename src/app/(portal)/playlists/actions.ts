@@ -1,5 +1,6 @@
 "use server";
 
+import { limitAction } from "@/server/rate-limit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { can } from "@/lib/roles";
@@ -46,6 +47,8 @@ async function run(fn: () => Promise<string>, values?: PlaylistValues): Promise<
 
 export async function createPlaylistAction(_prev: PlaylistActionResult, form: FormData): Promise<PlaylistActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const values = readPlaylist(form);
   const result = await run(async () => {
     await createPlaylist(actor, values);
@@ -58,6 +61,8 @@ export async function createPlaylistAction(_prev: PlaylistActionResult, form: Fo
 
 export async function editPlaylistAction(_prev: PlaylistActionResult, form: FormData): Promise<PlaylistActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = field(form, "id", 64);
   const values = readPlaylist(form);
   return run(async () => {
@@ -68,6 +73,8 @@ export async function editPlaylistAction(_prev: PlaylistActionResult, form: Form
 
 export async function deletePlaylistAction(_prev: PlaylistActionResult, form: FormData): Promise<PlaylistActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = field(form, "id", 64);
   return run(async () => {
     await deletePlaylist(actor, id);

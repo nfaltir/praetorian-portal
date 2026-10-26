@@ -1,5 +1,6 @@
 "use server";
 
+import { limitAction } from "@/server/rate-limit";
 import { revalidatePath } from "next/cache";
 import { can } from "@/lib/roles";
 import { requirePermission } from "@/lib/session";
@@ -30,6 +31,8 @@ async function run(fn: () => Promise<string>): Promise<RsvpActionResult> {
 
 export async function setRsvpAction(_prev: RsvpActionResult, form: FormData): Promise<RsvpActionResult> {
   const actor = await requirePermission(can.manageMembers);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const userId = field(form, "userId", 64);
   return run(async () => {
     await setRsvp(actor, userId, {
@@ -44,6 +47,8 @@ export async function setRsvpAction(_prev: RsvpActionResult, form: FormData): Pr
 
 export async function clearRsvpAction(_prev: RsvpActionResult, form: FormData): Promise<RsvpActionResult> {
   const actor = await requirePermission(can.manageMembers);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const userId = field(form, "userId", 64);
   return run(async () => {
     await clearRsvp(actor, userId);

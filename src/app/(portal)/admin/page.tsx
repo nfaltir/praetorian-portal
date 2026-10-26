@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CircleCheck, Clock, Download, ShieldCheck, ShieldOff, UserX } from "lucide-react";
+import { CircleCheck, Clock, Download, History, ShieldCheck, ShieldOff, UserX } from "lucide-react";
 import { can, roleLabels } from "@/lib/roles";
 import { requirePermission } from "@/lib/session";
 import { listMembers, mayManage } from "@/server/members";
@@ -25,12 +25,23 @@ export default async function AdminPage() {
             {active.length} accounts · {joined} joined · {active.length - joined} waiting on their setup link
           </p>
         </div>
-        <Link
-          href="/admin/exports"
-          className="inline-flex h-11 shrink-0 items-center gap-2 rounded-control border border-line bg-panel px-5 text-[14px] font-medium text-ink transition-colors hover:bg-brand-tint"
-        >
-          <Download size={16} aria-hidden="true" /> Exports
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/exports"
+            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-control border border-line bg-panel px-5 text-[14px] font-medium text-ink transition-colors hover:bg-brand-tint"
+          >
+            <Download size={16} aria-hidden="true" /> Exports
+          </Link>
+          {/* Superuser only; the page itself 404s for everyone else too */}
+          {can.manageRoles(actor.role) && (
+            <Link
+              href="/admin/activity"
+              className="inline-flex h-11 shrink-0 items-center gap-2 rounded-control border border-line bg-panel px-5 text-[14px] font-medium text-ink transition-colors hover:bg-brand-tint"
+            >
+              <History size={16} aria-hidden="true" /> Activity
+            </Link>
+          )}
+        </div>
       </div>
 
       <AddMemberForm canSetRole={can.manageRoles(actor.role)} />

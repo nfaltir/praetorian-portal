@@ -328,3 +328,16 @@ export const playlist = pgTable(
   ],
 );
 
+
+/*
+  App rate limits (Better Auth keeps its own table for sign-in endpoints).
+  One row per key, e.g. "action:vote:<userId>" or "signin-fail:<username>".
+  A fixed window: count resets once window_start is older than the window.
+  Rows are tiny and overwritten in place; nothing here is a record of
+  anything, so it is NOT append-only and may be cleared at any time.
+*/
+export const appRateLimit = pgTable("app_rate_limit", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+});

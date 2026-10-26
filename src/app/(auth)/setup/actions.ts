@@ -1,5 +1,6 @@
 "use server";
 
+import { clientIp, limitAction } from "@/server/rate-limit";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { AccountError, inspectLink, passwordSchema, redeemLink } from "@/server/accounts";
@@ -13,6 +14,7 @@ import { AccountError, inspectLink, passwordSchema, redeemLink } from "@/server/
 const tokenSchema = z.string().min(20).max(100);
 
 export async function checkLinkAction(token: string) {
+  if (await limitAction("setupLink", await clientIp())) return null;
   const parsed = tokenSchema.safeParse(token);
   if (!parsed.success) return null;
   const link = await inspectLink(parsed.data);
@@ -22,6 +24,8 @@ export async function checkLinkAction(token: string) {
 export type SetupState = { error?: string; fieldErrors?: { password?: string; confirm?: string } } | null;
 
 export async function redeemLinkAction(_prev: SetupState, form: FormData): Promise<SetupState> {
+  const blocked = await limitAction("setupLink", await clientIp());
+  if (blocked) return { error: blocked };
   const token = tokenSchema.safeParse(form.get("token"));
   if (!token.success) return { error: "This link is invalid or has expired. Ask an organizer for a new one." };
 

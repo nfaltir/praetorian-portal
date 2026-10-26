@@ -1,5 +1,6 @@
 "use server";
 
+import { limitAction } from "@/server/rate-limit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/session";
@@ -30,6 +31,8 @@ function refresh() {
 
 export async function startThreadAction(_prev: MessageActionResult, form: FormData): Promise<MessageActionResult> {
   const actor = await requireUser();
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const values = { subject: field(form, "subject", 200), body: field(form, "body", 5000) };
 
   let threadId: string;
@@ -45,6 +48,8 @@ export async function startThreadAction(_prev: MessageActionResult, form: FormDa
 
 export async function replyAction(_prev: MessageActionResult, form: FormData): Promise<MessageActionResult> {
   const actor = await requireUser();
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const threadId = field(form, "threadId", 64);
   const values = { body: field(form, "body", 5000) };
 
@@ -60,6 +65,8 @@ export async function replyAction(_prev: MessageActionResult, form: FormData): P
 
 export async function setClosedAction(_prev: MessageActionResult, form: FormData): Promise<MessageActionResult> {
   const actor = await requireUser();
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const threadId = field(form, "threadId", 64);
   const closed = field(form, "closed", 5) === "true";
 

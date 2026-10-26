@@ -43,7 +43,7 @@ const PLAN = [
   "Agree on a date. (The hardest part.)",
   "Fund it together, with every dollar in plain sight.",
   `Reunite in ${site.reunionPlace}, ${site.reunionYear}.`,
-  "Take over the FSM.",
+  "Take over the FSM, the RMI and Palau.",
 ];
 
 const STEPS = [

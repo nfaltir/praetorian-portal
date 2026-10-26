@@ -1,5 +1,6 @@
 "use server";
 
+import { limitAction } from "@/server/rate-limit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { site } from "@/config/site";
@@ -87,6 +88,8 @@ async function run(fn: () => Promise<string>, values?: PollValues): Promise<Poll
 
 export async function createPollAction(_prev: PollActionResult, form: FormData): Promise<PollActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const values = readPoll(form);
   const result = await run(async () => {
     const closesAt = classTimeToDate(values.closesAt);
@@ -107,6 +110,8 @@ export async function createPollAction(_prev: PollActionResult, form: FormData):
 
 export async function closePollAction(_prev: PollActionResult, form: FormData): Promise<PollActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = field(form, "id", 64);
   return run(async () => {
     await closePoll(actor, id);
@@ -116,6 +121,8 @@ export async function closePollAction(_prev: PollActionResult, form: FormData): 
 
 export async function deletePollAction(_prev: PollActionResult, form: FormData): Promise<PollActionResult> {
   const actor = await requirePermission(can.manageContent);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const id = field(form, "id", 64);
   return run(async () => {
     await deletePoll(actor, id);
@@ -125,6 +132,8 @@ export async function deletePollAction(_prev: PollActionResult, form: FormData):
 
 export async function voteAction(_prev: PollActionResult, form: FormData): Promise<PollActionResult> {
   const actor = await requireUser();
+  const blocked = await limitAction("vote", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const pollId = field(form, "pollId", 64);
   const optionId = field(form, "optionId", 64);
   return run(async () => {

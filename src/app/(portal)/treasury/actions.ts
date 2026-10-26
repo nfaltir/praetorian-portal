@@ -1,5 +1,6 @@
 "use server";
 
+import { limitAction } from "@/server/rate-limit";
 import { revalidatePath } from "next/cache";
 import { can } from "@/lib/roles";
 import { requirePermission } from "@/lib/session";
@@ -42,6 +43,8 @@ async function run(fn: () => Promise<string>, values?: Record<string, string>): 
 
 export async function recordPaymentAction(_prev: LedgerActionResult, form: FormData): Promise<LedgerActionResult> {
   const actor = await requirePermission(can.manageLedger);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const values = {
     memberId: field(form, "memberId", 64),
     amount: field(form, "amount", 20),
@@ -66,6 +69,8 @@ export async function recordPaymentAction(_prev: LedgerActionResult, form: FormD
 
 export async function reverseEntryAction(_prev: LedgerActionResult, form: FormData): Promise<LedgerActionResult> {
   const actor = await requirePermission(can.manageLedger);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const entryId = field(form, "entryId", 64);
   const reason = field(form, "reason");
 
@@ -77,6 +82,8 @@ export async function reverseEntryAction(_prev: LedgerActionResult, form: FormDa
 
 export async function setTargetAction(_prev: LedgerActionResult, form: FormData): Promise<LedgerActionResult> {
   const actor = await requirePermission(can.manageTargets);
+  const blocked = await limitAction("write", actor.id);
+  if (blocked) return { ok: false, message: blocked };
   const memberId = field(form, "memberId", 64);
   const target = field(form, "target", 20);
 
