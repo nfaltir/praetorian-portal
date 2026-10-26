@@ -7,6 +7,9 @@ import { Alert, Button, Field } from "@/components/ui/Form";
 import { Panel } from "@/components/ui/Panel";
 import { changeRoleAction, createMemberAction, issueLinkAction, toggleDisabledAction, type ActionResult } from "./actions";
 
+/* Roles that can be given from the site. Developer (superuser) is CLI-only. */
+const ASSIGNABLE_ROLES = ROLES.filter((r) => r !== "superuser");
+
 /*
   Shows a freshly issued link once. It can't be retrieved again later.
   Built without <Alert> so every level has min-w-0: a long URL scrolls
@@ -83,7 +86,7 @@ export function AddMemberForm({ canSetRole }: { canSetRole: boolean }) {
           <div className="flex flex-col gap-1.5">
             <label htmlFor="new-role" className="text-[14px] font-medium">Role</label>
             <select id="new-role" name="role" defaultValue={v?.role ?? "member"} className="h-11 rounded-control border border-line bg-panel px-3 text-[15px]">
-              {ROLES.map((r) => (
+              {ASSIGNABLE_ROLES.map((r) => (
                 <option key={r} value={r}>{roleLabels[r]}</option>
               ))}
             </select>
@@ -123,12 +126,12 @@ export function MemberRowActions({
             </Button>
           </form>
         )}
-        {canSetRole && !member.disabled && (
+        {canSetRole && !member.disabled && member.role !== "superuser" && (
           <form action={roleAction} className="flex gap-1">
             <input type="hidden" name="userId" value={member.id} />
             <label className="sr-only" htmlFor={`role-${member.id}`}>Role for {member.name}</label>
             <select id={`role-${member.id}`} name="role" defaultValue={member.role} className="h-9 rounded-control border border-line bg-panel px-2 text-[13px]">
-              {ROLES.map((r) => (
+              {ASSIGNABLE_ROLES.map((r) => (
                 <option key={r} value={r}>{roleLabels[r]}</option>
               ))}
             </select>

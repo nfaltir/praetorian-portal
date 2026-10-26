@@ -51,6 +51,8 @@ export async function createMemberAction(_prev: ActionResult, form: FormData): P
     if (!can.manageRoles(actor.role)) return { ok: false, message: "Only the developer account can create staff accounts.", values };
     const parsed = roleSchema.safeParse(requested);
     if (!parsed.success) return { ok: false, message: "Unknown role.", values };
+    // Developer (superuser) accounts are created only from the command line
+    if (parsed.data === "superuser") return { ok: false, message: "Developer accounts can't be created here.", values };
     role = parsed.data;
   }
 
@@ -110,6 +112,10 @@ export async function changeRoleAction(_prev: ActionResult, form: FormData): Pro
   const target = await getTarget(id.data);
   if (!target) return { ok: false, message: "Unknown member." };
   if (target.id === actor.id) return { ok: false, message: "You can't change your own role." };
+  // Granting or removing Developer (superuser) is done only from the command line
+  if (role.data === "superuser" || target.role === "superuser") {
+    return { ok: false, message: "Developer access can only be changed from the command line." };
+  }
   if (target.role === role.data) return { ok: true };
 
   await setRole(actor, target.id, target.role, role.data);
