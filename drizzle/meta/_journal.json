@@ -64,6 +64,20 @@
       "when": 1792799019863,
       "tag": "0008_playlists",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792971992736,
+      "tag": "0009_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792973265791,
+      "tag": "0010_drop_settings",
+      "breakpoints": true
     }
   ]
 }

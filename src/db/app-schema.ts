@@ -327,3 +327,4 @@ export const playlist = pgTable(
     index("playlist_created_idx").on(t.createdAt),
   ],
 );
+
