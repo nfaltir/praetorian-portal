@@ -365,3 +365,37 @@ export const updateVote = pgTable(
     check("update_vote_value_valid", sql`${t.value} IN (1, -1)`),
   ],
 );
+
+/*
+  Comments under updates. Plain text, flat (no nested replies).
+  - Authors can edit (marked edited) or delete their own comments.
+  - Organizers can remove any comment: the row stays as a placeholder
+    ("removed by an organizer") with its text cleared, and the removed
+    text goes to the audit log, so moderation is visible and traceable.
+  - Deleting the update deletes its comments.
+*/
+export const updateComment = pgTable(
+  "update_comment",
+  {
+    id: text("id").primaryKey(),
+    updateId: text("update_id")
+      .notNull()
+      .references(() => announcement.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    editedAt: timestamp("edited_at", { withTimezone: true }),
+    removedAt: timestamp("removed_at", { withTimezone: true }),
+    removedBy: text("removed_by").references(() => user.id, { onDelete: "set null" }),
+  },
+  (t) => [
+    // Live comments have 1 to 1000 characters; removed ones keep no text at all
+    check(
+      "update_comment_body_valid",
+      sql`(${t.removedAt} IS NULL AND char_length(${t.body}) BETWEEN 1 AND 1000) OR (${t.removedAt} IS NOT NULL AND ${t.body} = '')`,
+    ),
+    index("update_comment_update_idx").on(t.updateId, t.createdAt),
+  ],
+);

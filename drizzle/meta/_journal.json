@@ -92,6 +92,13 @@
       "when": 1793291513608,
       "tag": "0012_update_votes",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793304788156,
+      "tag": "0013_update_comments",
+      "breakpoints": true
     }
   ]
 }

@@ -10,6 +10,8 @@ import { Panel } from "@/components/ui/Panel";
 import { DeleteUpdateForm, EditUpdateForm } from "./UpdateForms";
 import { VoteButtons } from "./VoteButtons";
 import { loadUpdateVotes } from "@/server/update-votes";
+import { CommentThread } from "./CommentThread";
+import { loadComments } from "@/server/update-comments";
 
 export const metadata: Metadata = { title: "Updates" };
 export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
@@ -25,7 +27,8 @@ export default async function UpdatesPage() {
   const isOrganizer = can.manageContent(viewer.role);
   const now = new Date();
   const updates = await loadUpdates();
-  const votes = await loadUpdateVotes(updates.map((u) => u.id), viewer.id);
+  const ids = updates.map((u) => u.id);
+  const [votes, comments] = await Promise.all([loadUpdateVotes(ids, viewer.id), loadComments(ids)]);
 
   return (
     <div className="mx-auto flex max-w-[860px] flex-col gap-6">
@@ -83,6 +86,16 @@ export default async function UpdatesPage() {
 
                   <div className="mt-4">
                     <VoteButtons updateId={u.id} votes={votes.get(u.id)!} myName={viewer.name} />
+                  </div>
+
+                  <div className="mt-3">
+                    <CommentThread
+                      updateId={u.id}
+                      comments={comments.get(u.id) ?? []}
+                      viewerId={viewer.id}
+                      isOrganizer={isOrganizer}
+                      nowIso={now.toISOString()}
+                    />
                   </div>
 
                   {isOrganizer && (

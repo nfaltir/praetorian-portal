@@ -82,6 +82,8 @@ function describe(i: ActivityItem): { icon: typeof LogIn; tone: string; text: st
     case "update.edited":
     case "update.deleted":
       return { icon: FileText, tone: "text-brand", text: `${who} ${i.action.split(".")[1]} the update "${str(d.title)}"` };
+    case "update.comment_removed":
+      return { icon: FileText, tone: "text-danger", text: `${who} removed a comment by ${them}` };
     case "poll.created":
     case "poll.closed":
     case "poll.deleted":
