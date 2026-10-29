@@ -8,6 +8,8 @@ import { initials, longDate, relativeTime } from "@/lib/format";
 import { loadUpdates } from "@/server/updates";
 import { Panel } from "@/components/ui/Panel";
 import { DeleteUpdateForm, EditUpdateForm } from "./UpdateForms";
+import { VoteButtons } from "./VoteButtons";
+import { loadUpdateVotes } from "@/server/update-votes";
 
 export const metadata: Metadata = { title: "Updates" };
 export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
@@ -23,6 +25,7 @@ export default async function UpdatesPage() {
   const isOrganizer = can.manageContent(viewer.role);
   const now = new Date();
   const updates = await loadUpdates();
+  const votes = await loadUpdateVotes(updates.map((u) => u.id), viewer.id);
 
   return (
     <div className="mx-auto flex max-w-[860px] flex-col gap-6">
@@ -77,6 +80,10 @@ export default async function UpdatesPage() {
                     {u.title}
                   </h2>
                   <p className="mt-2 text-[15px] leading-relaxed break-words whitespace-pre-line">{u.body}</p>
+
+                  <div className="mt-4">
+                    <VoteButtons updateId={u.id} votes={votes.get(u.id)!} myName={viewer.name} />
+                  </div>
 
                   {isOrganizer && (
                     <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-line pt-3 [&>details[open]]:basis-full">

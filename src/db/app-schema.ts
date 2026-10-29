@@ -341,3 +341,27 @@ export const appRateLimit = pgTable("app_rate_limit", {
   count: integer("count").notNull(),
   windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
 });
+
+/*
+  Up and down votes on updates. Public by design: everyone signed in sees
+  who voted which way (the class asked for open, direct feedback).
+  One vote per person per update; changing it overwrites the row.
+  Deleting the update or the account removes its votes.
+*/
+export const updateVote = pgTable(
+  "update_vote",
+  {
+    updateId: text("update_id")
+      .notNull()
+      .references(() => announcement.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    value: integer("value").notNull(), // 1 = up, -1 = down
+    votedAt: timestamp("voted_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.updateId, t.userId] }),
+    check("update_vote_value_valid", sql`${t.value} IN (1, -1)`),
+  ],
+);
