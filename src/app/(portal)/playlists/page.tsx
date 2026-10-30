@@ -80,7 +80,7 @@ export default async function PlaylistsPage() {
         {isOrganizer && (
           <Link
             href="/playlists/new"
-            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-control bg-conic-[at_bottom_right] from-[#ff4d4d] via-[#ff8364] to-[#fdb87d] px-5 text-[14px] font-semibold text-white shadow-[0_10px_24px_-10px_rgb(255_77_77/0.55)] transition-[filter,box-shadow] [text-shadow:0_1px_3px_rgb(120_20_20/0.45)] hover:brightness-95 hover:shadow-[0_14px_30px_-10px_rgb(255_77_77/0.65)]"
+            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-conic-[at_bottom_right] from-[#ff4d4d] via-[#ff8364] to-[#fdb87d] px-5 text-[14px] font-semibold text-white shadow-[0_10px_24px_-10px_rgb(255_77_77/0.55)] transition-[filter,box-shadow] [text-shadow:0_1px_3px_rgb(120_20_20/0.45)] hover:brightness-95 hover:shadow-[0_14px_30px_-10px_rgb(255_77_77/0.65)]"
           >
             <Plus size={17} aria-hidden="true" /> New playlist
           </Link>

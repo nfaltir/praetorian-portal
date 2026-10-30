@@ -49,7 +49,7 @@ export default async function PollsPage() {
         {isOrganizer && (
           <Link
             href="/polls/new"
-            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-control bg-brand px-5 text-[14px] font-medium text-on-dark transition-colors hover:bg-brand-ink"
+            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-brand px-5 text-[14px] font-medium text-on-dark transition-colors hover:bg-brand-ink"
           >
             <Plus size={17} aria-hidden="true" /> New poll
           </Link>

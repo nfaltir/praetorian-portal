@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Gift, Users } from "lucide-react";
+import { Gift, Users, UtensilsCrossed } from "lucide-react";
 import { can } from "@/lib/roles";
 import { requireUser } from "@/lib/session";
 import { initials } from "@/lib/format";
@@ -71,6 +71,14 @@ export default async function ClassmatesPage() {
         <p className="mt-1 text-[14px] text-muted">
           Who&apos;s coming to the reunion. {isOrganizer ? "Record RSVPs as classmates reply." : "Organizers keep this list up to date."}
         </p>
+        <div className="mt-3 flex max-w-[680px] items-start gap-2.5 rounded-control border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-[12px] leading-relaxed text-amber-950">
+          <UtensilsCrossed size={16} className="mt-0.5 shrink-0 text-amber-700" aria-hidden="true" />
+          <p>
+            <span className="font-semibold">Note:</span> &ldquo;Bringing&rdquo; items are food and legal drinks for the
+            reunion. Anything listed that is not, or that sounds over the top, is a joke between classmates and is not
+            actually being brought.
+          </p>
+        </div>
       </div>
 
       <Panel className="p-5 sm:p-6" labelledBy="rsvp-summary">
