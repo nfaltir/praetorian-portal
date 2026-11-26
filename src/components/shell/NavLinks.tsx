@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
+import { Gamepad2,
   CalendarDays, CircleDollarSign, House, Images, Landmark, Mail,
   Music, Newspaper, Settings, ShieldCheck, Users, Vote,
 } from "lucide-react";
@@ -16,6 +16,7 @@ const icons = {
   events: CalendarDays,
   polls: Vote,
   playlists: Music,
+  games: Gamepad2,
   treasury: Landmark,
   gallery: Images,
   messages: Mail,

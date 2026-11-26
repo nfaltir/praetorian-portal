@@ -1,6 +1,8 @@
 import { Sidebar } from "@/components/shell/Sidebar";
 import { TopBar } from "@/components/shell/TopBar";
 import { Footer } from "@/components/shell/Footer";
+import { SEASON } from "@/lib/season";
+import { SnowScene } from "@/components/season/SnowScene";
 
 /*
   Portal pages render on the server in tens of milliseconds, so a click
@@ -14,7 +16,8 @@ export const instant = false;
 
 export default function PortalLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex min-h-dvh">
+    <div className="flex min-h-dvh" data-season={SEASON ?? undefined}>
+      {SEASON === "christmas" && <SnowScene />}
       <a
         href="#main"
         className="sr-only z-50 rounded-control bg-panel px-4 py-2 focus:not-sr-only focus:fixed focus:top-3 focus:left-3"

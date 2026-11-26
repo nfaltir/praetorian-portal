@@ -202,3 +202,50 @@ html,
 body {
   overflow-x: clip;
 }
+/*
+  CHRISTMAS SEASON
+  Switched on by SEASON in src/lib/season.ts (data-season on the portal layout).
+  Red and white: snow-white page, white sidebar, Christmas red actions,
+  gold badges. Sky and snow are drawn by src/components/season/SnowScene.tsx.
+  Contrast checked: white on red buttons 5.5:1, red links on page 5.2:1,
+  sidebar text 13.4:1, sidebar muted 5.8:1, badge text on gold 6.4:1.
+*/
+[data-season="christmas"] {
+  --brand-ink: #7a1622; /* button hover, badge text: deep red */
+  --brand: #d3011c; /* buttons, links, progress, charts: Christmas red */
+  --brand-soft: #f3c9ce; /* secondary chart elements: blush */
+  --accent: #e9c46a; /* gold badges and highlights */
+  --page: #f7f7f8; /* inputs, table heads, mobile top bar */
+
+  --brand-tint: color-mix(in oklab, var(--brand) 7%, white);
+  --accent-tint: color-mix(in oklab, var(--brand) 7%, white);
+  --on-dark-muted: color-mix(in oklab, var(--on-dark) 66%, var(--brand-ink));
+  --on-dark-line: color-mix(in oklab, var(--on-dark) 12%, var(--brand-ink));
+  --on-dark-hover: color-mix(in oklab, var(--on-dark) 7%, var(--brand-ink));
+
+  isolation: isolate; /* keeps the snow scene above the background, below content */
+  /* Fallback when WebGL is unavailable; SnowScene paints over it otherwise */
+  background:
+    radial-gradient(80% 50% at 45% 0%, #fffcf5 0%, transparent 65%),
+    linear-gradient(180deg, #fbf6ef 0%, #f1ecf1 70%, #e6e9f0 100%);
+}
+
+/*
+  Dark surfaces (sidebar, mobile menu) turn white, so their text
+  tokens flip to dark ink and their accents to red inside them.
+*/
+[data-season="christmas"] .bg-brand-ink {
+  --brand-ink: #ffffff;
+  --brand: #fbe9eb;
+  --on-dark: #2b2f36;
+  --on-dark-muted: #5f6670;
+  --on-dark-line: rgb(43 47 54 / 0.1);
+  --on-dark-hover: #fbeff0;
+  --accent: #d3011c;
+}
+
+[data-season="christmas"] aside.bg-brand-ink {
+  box-shadow: inset -1px 0 0 rgb(43 47 54 / 0.08); /* edge against the page */
+}
+
+/* END CHRISTMAS SEASON */

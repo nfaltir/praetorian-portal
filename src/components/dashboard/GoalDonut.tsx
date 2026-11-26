@@ -4,7 +4,14 @@ import { Cell, Pie, PieChart, Tooltip } from "recharts";
 
 type Slice = { name: string; value: number; color: string; label: string };
 
-/* Decorative-plus-hover chart. The same numbers are always printed beside it. */
+/*
+  Decorative-plus-hover chart. The same numbers are always printed beside it.
+  "Collected" is filled with a red to orange to yellow gradient. SVG has no
+  sweep (conic) gradient, so it runs diagonally across the arc's area: red
+  where the arc starts at the top, warming toward yellow as it grows.
+*/
+const COLLECTED_GRADIENT = "goal-donut-collected";
+
 export function GoalDonut({
   collectedCents,
   remainingCents,
@@ -19,7 +26,7 @@ export function GoalDonut({
   size?: number;
 }) {
   const data: Slice[] = [
-    { name: "Collected", value: collectedCents, color: "var(--brand)", label: collectedLabel },
+    { name: "Collected", value: collectedCents, color: `url(#${COLLECTED_GRADIENT})`, label: collectedLabel },
     { name: "Remaining", value: remainingCents, color: "var(--brand-soft)", label: remainingLabel },
   ].filter((d) => d.value > 0);
 
@@ -29,6 +36,13 @@ export function GoalDonut({
 
   return (
     <PieChart width={size} height={size} accessibilityLayer={false}>
+      <defs>
+        <linearGradient id={COLLECTED_GRADIENT} x1="0" y1="0" x2="0.85" y2="1">
+          <stop offset="0%" stopColor="#e11d48" />
+          <stop offset="55%" stopColor="#f97316" />
+          <stop offset="100%" stopColor="#facc15" />
+        </linearGradient>
+      </defs>
       <Pie
         data={data}
         dataKey="value"

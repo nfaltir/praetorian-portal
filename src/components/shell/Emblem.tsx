@@ -8,13 +8,17 @@ import Image from "next/image";
   width and lets height follow the image's real aspect ratio (Tailwind's
   base styles already set height: auto, which triggered Next's warning).
 */
+// The crest file is 202 x 192 px. Height must follow that ratio, or Next
+// warns that one dimension was changed without the other.
+const CREST_RATIO = 192 / 202;
+
 export function Emblem({ size = 44 }: { size?: number }) {
   return (
     <Image
       src="/images/xhs_logo.avif"
       alt=""
       width={size}
-      height={Math.round(size * 1.15)}
+      height={Math.round(size * CREST_RATIO)}
       style={{ width: size, height: "auto" }}
       className="shrink-0 object-contain"
       priority

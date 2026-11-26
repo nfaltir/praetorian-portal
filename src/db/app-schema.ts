@@ -330,6 +330,31 @@ export const playlist = pgTable(
 
 
 /*
+  Praetorian Trivia question cards. Organizers write, edit and switch them
+  off in Staff Admin; signed-in classmates draw them in the game. A card
+  that is switched off stays for history but leaves the deck.
+*/
+export const triviaCard = pgTable(
+  "trivia_card",
+  {
+    id: text("id").primaryKey(),
+    question: text("question").notNull(),
+    answer: text("answer").notNull(),
+    active: boolean("active").notNull().default(true),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+  },
+  (t) => [
+    check("trivia_question_length", sql`char_length(${t.question}) BETWEEN 1 AND 280`),
+    check("trivia_answer_length", sql`char_length(${t.answer}) BETWEEN 1 AND 160`),
+    index("trivia_card_active_idx").on(t.active),
+  ],
+);
+
+/*
   App rate limits (Better Auth keeps its own table for sign-in endpoints).
   One row per key, e.g. "action:vote:<userId>" or "signin-fail:<username>".
   A fixed window: count resets once window_start is older than the window.

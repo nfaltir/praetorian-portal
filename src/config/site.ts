@@ -34,7 +34,7 @@ export const site = {
   ],
 
   /* Optional banner photo in /public, e.g. "/images/banner.jpg". null uses the drawn fallback. */
-  bannerImage: "/images/banner.jpg" as string | null,
+  bannerImage: "/images/xmas.avif" as string | null,
 
   /* Credit line in the footer */
   builtBy: "the Praetorianz Tech Team",

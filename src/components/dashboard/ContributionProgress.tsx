@@ -1,41 +1,68 @@
-import { Star } from "lucide-react";
+import { ChevronDown, Star } from "lucide-react";
 import { site } from "@/config/site";
 import type { ClassSummary } from "@/lib/ledger";
-import type { LedgerEntry, Member } from "@/lib/types";
-import { money, percent, shortDate } from "@/lib/format";
-import { Badge, Panel, PanelHeader, StatusIcons } from "@/components/ui/Panel";
+import type { Member } from "@/lib/types";
+import { money, percent } from "@/lib/format";
+import { Panel, PanelHeader } from "@/components/ui/Panel";
 import { GoalDonut } from "./GoalDonut";
 
 /*
   Contributions are public to members (agreed): names and amounts.
   Individual targets are private, so nothing here reveals a target.
+  Classmates who have contributed are always listed; the rest sit behind
+  a toggle so the card stays compact as the class grows.
 */
 export function ContributionProgress({
   summary,
   members,
   totals,
-  recent,
-  reversed,
 }: {
   summary: ClassSummary;
   members: Member[];
   totals: Map<string, number>;
-  recent: LedgerEntry[];
-  reversed: Set<string>;
 }) {
-  const byId = new Map(members.map((m) => [m.id, m]));
-
   const ranked = members
     .map((m) => ({ member: m, cents: Math.max(0, totals.get(m.id) ?? 0) }))
     .sort((a, b) => b.cents - a.cents || a.member.name.localeCompare(b.member.name));
+  const given = ranked.filter((r) => r.cents > 0);
+  const notYet = ranked.filter((r) => r.cents === 0);
   // Bars measure progress toward the standard (public) target, not each
   // other, so one large gift doesn't shrink everyone else's bar.
   const barScale = Math.max(1, site.defaultTargetCents);
 
   const legend = [
-    { label: "Collected", value: summary.collectedCents, pct: summary.percent, swatch: "bg-brand" },
+    { label: "Collected", value: summary.collectedCents, pct: summary.percent, swatch: "bg-linear-to-br from-[#e11d48] via-[#f97316] to-[#facc15]" },
     { label: "Remaining", value: summary.remainingCents, pct: Math.max(0, 100 - summary.percent), swatch: "bg-brand-soft" },
   ];
+
+  const row = ({ member, cents }: { member: Member; cents: number }) => {
+    // Measured against the public standard amount, never a private target
+    const beyond = cents > barScale;
+    return (
+      <li key={member.id} className="grid grid-cols-[minmax(0,9rem)_1fr_4.5rem] items-center gap-3 text-[13px]">
+        <span className="flex min-w-0 items-center gap-1">
+          <span className="truncate">{member.name}</span>
+          {beyond && (
+            <>
+              <Star size={12} className="shrink-0 fill-accent text-accent" aria-hidden="true" />
+              <span className="sr-only">(gave above {money(barScale)})</span>
+            </>
+          )}
+        </span>
+        <span className="h-2 overflow-hidden rounded-full bg-line" aria-hidden="true">
+          {cents > 0 && (
+            <span
+              className={`block h-full rounded-full ${beyond ? "bg-accent" : "bg-brand"}`}
+              style={{ width: `${Math.min(100, Math.max(3, (cents / barScale) * 100))}%` }}
+            />
+          )}
+        </span>
+        <span className={`figures text-right ${cents > 0 ? "font-medium" : "text-muted"}`}>
+          {cents > 0 ? money(cents) : "None yet"}
+        </span>
+      </li>
+    );
+  };
 
   return (
     <Panel className="p-5 sm:p-6" labelledBy="progress-heading">
@@ -58,14 +85,14 @@ export function ContributionProgress({
         </div>
 
         <dl className="w-full max-w-sm text-[14px]">
-          {legend.map((row) => (
-            <div key={row.label} className="flex items-center gap-3 border-b border-line py-2.5">
+          {legend.map((r) => (
+            <div key={r.label} className="flex items-center gap-3 border-b border-line py-2.5">
               <dt className="flex flex-1 items-center gap-2.5">
-                <span className={`size-3 rounded-full ${row.swatch}`} aria-hidden="true" />
-                {row.label}
+                <span className={`size-3 rounded-full ${r.swatch}`} aria-hidden="true" />
+                {r.label}
               </dt>
-              <dd className="figures w-24 text-right font-semibold">{money(row.value)}</dd>
-              <dd className="figures w-12 text-right text-muted">{percent(row.pct)}</dd>
+              <dd className="figures w-24 text-right font-semibold">{money(r.value)}</dd>
+              <dd className="figures w-12 text-right text-muted">{percent(r.pct)}</dd>
             </div>
           ))}
           <div className="flex items-center gap-3 py-2.5">
@@ -87,86 +114,29 @@ export function ContributionProgress({
             {summary.contributorCount} of {members.length} classmates
           </p>
         </div>
-        <ol className="mt-3 grid gap-x-8 gap-y-2.5 md:grid-cols-2">
-          {ranked.map(({ member, cents }) => {
-            // Measured against the public standard amount, never a private target
-            const beyond = cents > barScale;
-            return (
-              <li key={member.id} className="grid grid-cols-[minmax(0,9rem)_1fr_4.5rem] items-center gap-3 text-[13px]">
-                <span className="flex min-w-0 items-center gap-1">
-                  <span className="truncate">{member.name}</span>
-                  {beyond && (
-                    <>
-                      <Star size={12} className="shrink-0 fill-accent text-accent" aria-hidden="true" />
-                      <span className="sr-only">(gave above {money(barScale)})</span>
-                    </>
-                  )}
-                </span>
-                <span className="h-2 overflow-hidden rounded-full bg-line" aria-hidden="true">
-                  {cents > 0 && (
-                    <span
-                      className={`block h-full rounded-full ${beyond ? "bg-accent" : "bg-brand"}`}
-                      style={{ width: `${Math.min(100, Math.max(3, (cents / barScale) * 100))}%` }}
-                    />
-                  )}
-                </span>
-                <span className={`figures text-right ${cents > 0 ? "font-medium" : "text-muted"}`}>
-                  {cents > 0 ? money(cents) : "None yet"}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-        {ranked.some((r) => r.cents > barScale) && (
+
+        {given.length > 0 ? (
+          <ol className="mt-3 grid gap-x-8 gap-y-2.5 md:grid-cols-2">{given.map(row)}</ol>
+        ) : (
+          <p className="mt-3 text-[14px] text-muted">No contributions yet.</p>
+        )}
+
+        {notYet.length > 0 && (
+          <details className="group mt-3">
+            <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-[13px] font-medium text-brand [&::-webkit-details-marker]:hidden">
+              <ChevronDown size={14} className="transition-transform group-open:rotate-180" aria-hidden="true" />
+              <span className="group-open:hidden">Show the {notYet.length} still to contribute</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </summary>
+            <ol className="mt-3 grid gap-x-8 gap-y-2.5 md:grid-cols-2">{notYet.map(row)}</ol>
+          </details>
+        )}
+
+        {given.some((r) => r.cents > barScale) && (
           <p className="mt-3 flex items-center gap-1.5 text-[12px] text-muted">
             <Star size={12} className="fill-accent text-accent" aria-hidden="true" />
             Gave above the standard {money(barScale)}. Thank you!
           </p>
-        )}
-      </div>
-
-      {/* Recent ledger entries */}
-      <div className="mt-8">
-        <h3 className="font-serif text-[19px] font-semibold">Recent Contributions</h3>
-        {recent.length === 0 ? (
-          <p className="mt-3 text-[14px] text-muted">No contributions recorded yet.</p>
-        ) : (
-          <div className="mt-3 overflow-hidden rounded-control border border-line">
-            <table className="w-full text-[13px]">
-              <thead className="bg-page text-left text-muted">
-                <tr>
-                  <th scope="col" className="px-4 py-2.5 font-medium">Date</th>
-                  <th scope="col" className="px-4 py-2.5 font-medium">Classmate</th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-medium">Amount</th>
-                  <th scope="col" className="hidden px-4 py-2.5 font-medium sm:table-cell">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {recent.map((e) => {
-                  const isReversal = e.kind === "reversal";
-                  const wasReversed = reversed.has(e.id);
-                  return (
-                    <tr key={e.id}>
-                      <td className="figures px-4 py-2.5 whitespace-nowrap text-muted">{shortDate(e.paidOn)}</td>
-                      <td className="px-4 py-2.5">{byId.get(e.memberId)?.name ?? "Unknown"}</td>
-                      <td className={`figures px-4 py-2.5 text-right font-medium ${wasReversed ? "text-muted line-through decoration-1" : isReversal ? "text-danger" : ""}`}>
-                        {isReversal ? `-${money(e.amountCents)}` : money(e.amountCents)}
-                      </td>
-                      <td className="hidden px-4 py-2.5 sm:table-cell">
-                        {isReversal ? (
-                          <Badge tone="danger" icon={StatusIcons.reversed}>Correction</Badge>
-                        ) : wasReversed ? (
-                          <Badge tone="neutral" icon={StatusIcons.reversed}>Reversed</Badge>
-                        ) : (
-                          <Badge tone="success" icon={StatusIcons.recorded}>Recorded</Badge>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
         )}
       </div>
     </Panel>

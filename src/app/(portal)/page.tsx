@@ -11,6 +11,7 @@ import { StatCards } from "@/components/dashboard/StatCards";
 import { LatestUpdates } from "@/components/dashboard/LatestUpdates";
 import { OpenPolls } from "@/components/dashboard/OpenPolls";
 import { ContributionProgress } from "@/components/dashboard/ContributionProgress";
+import { RecentContributions, RECENT_LIMIT } from "@/components/dashboard/RecentContributions";
 
 export const instant = false; // reads the session; blocks on the server by design (see (portal)/layout.tsx)
 
@@ -54,13 +55,8 @@ export default async function HomePage() {
         />
         <LatestUpdates updates={updates} members={members} now={now} />
         <OpenPolls polls={openPolls} now={now} />
-        <ContributionProgress
-          summary={summary}
-          members={members}
-          totals={totals}
-          recent={ledger.slice(0, 6)}
-          reversed={reversedIds(ledger)}
-        />
+        <ContributionProgress summary={summary} members={members} totals={totals} />
+        <RecentContributions members={members} recent={ledger.slice(0, RECENT_LIMIT)} reversed={reversedIds(ledger)} />
       </div>
 
       <figure className="relative overflow-hidden rounded-panel border border-line bg-panel px-6 py-7 sm:px-10">

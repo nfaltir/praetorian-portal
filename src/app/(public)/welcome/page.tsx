@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ArrowRight, CalendarHeart, HandCoins, KeyRound, Lock, Megaphone, Music, Star, UserCheck, Vote } from "lucide-react";
 import { site, classLabel } from "@/config/site";
 import { Emblem } from "@/components/shell/Emblem";
 import { Footer } from "@/components/shell/Footer";
+import { SnowScene } from "@/components/season/SnowScene";
+import { SEASON } from "@/lib/season";
 
 export const metadata: Metadata = { title: "Welcome" };
 
@@ -115,12 +118,83 @@ function ContributionsPreview() {
   );
 }
 
+/* ---------- Christmas greeting ribbon ---------- */
+
+/* A fly agaric, the red-and-white mushroom of European Christmas ornaments */
+function Mushroom({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className="shrink-0">
+      <path d="M9.5 13.5h5l.8 7.2a1.4 1.4 0 0 1-1.4 1.6h-3.8a1.4 1.4 0 0 1-1.4-1.6z" fill="#f6ead6" stroke="#b08968" strokeWidth="0.9" />
+      <path d="M2.5 13.2C2.5 7.6 6.8 3.5 12 3.5s9.5 4.1 9.5 9.7c0 .7-.5 1.1-1.2 1.1H3.7c-.7 0-1.2-.4-1.2-1.1z" fill="#d3011c" />
+      <g fill="#fff">
+        <circle cx="8" cy="8.6" r="1.4" />
+        <circle cx="13.2" cy="6.6" r="1.1" />
+        <circle cx="16.6" cy="10.2" r="1.5" />
+        <circle cx="10.6" cy="11.4" r="0.9" />
+        <circle cx="5.6" cy="12" r="0.8" />
+      </g>
+    </svg>
+  );
+}
+
+/* Notched tail tucked behind the band; the right one is the same shape mirrored */
+function RibbonTail({ className = "" }: { className?: string }) {
+  return (
+    <svg width="38" height="44" viewBox="0 0 38 44" className={`shrink-0 ${className}`} aria-hidden="true">
+      <path d="M37 10H1l10 16-10 16h36z" fill="#fff" stroke="var(--brand)" strokeWidth="1" strokeLinejoin="round" />
+      <path d="M29 34h8v8z" fill="var(--brand-soft)" stroke="var(--brand)" strokeWidth="1" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* Line-art banner with folded tails and a faint gold sunburst behind it */
+function ChristmasRibbon({ children }: { children: ReactNode }) {
+  return (
+    <div className="relative mt-6 inline-flex items-start">
+      <svg
+        className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-[260%] w-[130%] -translate-x-1/2 -translate-y-1/2"
+        viewBox="-100 -100 200 200"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {Array.from({ length: 14 }, (_, i) => {
+          // Two side fans, so the rays frame the ribbon without crossing the crest or the text below
+          const a = (i < 7 ? 0 : Math.PI) + ((i % 7) - 3) * (Math.PI / 14);
+          const r1 = 62 + (i % 3) * 6;
+          const r2 = 92 + (i % 2) * 6;
+          return (
+            <line
+              key={i}
+              x1={(Math.cos(a) * r1).toFixed(1)}
+              y1={(Math.sin(a) * r1).toFixed(1)}
+              x2={(Math.cos(a) * r2).toFixed(1)}
+              y2={(Math.sin(a) * r2).toFixed(1)}
+              stroke="#f2b632"
+              strokeOpacity="0.55"
+              strokeWidth="1.2"
+              vectorEffect="non-scaling-stroke"
+            />
+          );
+        })}
+      </svg>
+      <RibbonTail className="-mr-2.25" />
+      <p className="relative z-10 inline-flex h-8.5 items-center gap-2 border border-brand bg-white px-3 font-serif text-[13px] font-semibold whitespace-nowrap text-brand italic shadow-[0_6px_14px_-8px_rgb(150_10_30/0.45)] min-[400px]:px-4 min-[400px]:text-[15px] sm:text-[17px]">
+        <Mushroom size={20} />
+        {children}
+      </p>
+      <RibbonTail className="-ml-2.25 -scale-x-100" />
+    </div>
+  );
+}
+
 export default function WelcomePage() {
   return (
-    <div className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-linear-to-b from-white via-[#fbf8f1] to-[#f1e9d8]">
+    <div className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-linear-to-b from-white via-[#fbf8f1] to-[#f1e9d8]" data-season={SEASON ?? undefined}>
+      {SEASON === "christmas" && <SnowScene />}
       {/* One continuous gradient with soft glows down the whole page: no section has its own background */}
-      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-        <div className="absolute -top-40 -left-32 size-140nded-full bg-[#1e3a5f]/10 blur-3xl" />
+      {/* The glows step aside during Christmas so the animated sky stays clean */}
+      <div className={`pointer-events-none absolute inset-0 -z-10 ${SEASON === "christmas" ? "hidden" : ""}`} aria-hidden="true">
+        <div className="absolute -top-40 -left-32 size-140 rounded-full bg-[#1e3a5f]/10 blur-3xl" />
         <div className="absolute top-[18%] -right-48 size-140 rounded-full bg-[#9b2226]/8 blur-3xl" />
         <div className="absolute top-[42%] -left-48 size-130 rounded-full bg-sky-200/25 blur-3xl" />
         <div className="absolute top-[62%] -right-40 size-130 rounded-full bg-amber-200/30 blur-3xl" />
@@ -142,8 +216,12 @@ export default function WelcomePage() {
 
       <main id="main" className="flex-1">
         {/* Hero */}
-        <section className="mx-auto flex max-w-215 flex-col items-center px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-16">
+        <section className="relative mx-auto flex max-w-215 flex-col items-center px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-16">
+          {SEASON === "christmas" && (
+            <div className="pointer-events-none absolute inset-x-[-10%] inset-y-0 -z-10 bg-[radial-gradient(60%_55%_at_50%_45%,rgb(255_255_255/0.75),transparent_75%)]" aria-hidden="true" />
+          )}
           <Emblem size={84} />
+          {SEASON === "christmas" && <ChristmasRibbon>Merry Christmas from the {classLabel}</ChristmasRibbon>}
           <p className="mt-5 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted">
             {site.schoolName} · {classLabel}
           </p>
@@ -163,7 +241,7 @@ export default function WelcomePage() {
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
             <Link
               href="/login"
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-brand px-7 text-[15px] font-semibold text-on-dark shadow-[0_12px_28px_-12px_rgb(19_40_63/0.7)] transition-colors hover:bg-brand-ink"
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-brand px-7 text-[15px] font-semibold text-on-dark shadow-[0_12px_28px_-12px_color-mix(in_oklab,var(--brand)_65%,transparent)] transition-colors hover:bg-brand-ink"
             >
               Sign in to the portal <ArrowRight size={17} aria-hidden="true" />
             </Link>
